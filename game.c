@@ -2,7 +2,31 @@
 #include "game.h"
 #include "helpers.h"
 
-void reset_object(object *o, int object_n)
+void init_object(object *o, int object_n)
+{
+    char sprite1_fn[20], sprite2_fn[20];
+
+    switch (object_n) {
+        case PROJECTILE:
+            //break;
+        case BIRD:
+            //break;
+        case APPLE:
+            strcpy(sprite1_fn, "newton1.png");
+            strcpy(sprite2_fn, "newton2.png");
+            //break;
+    }
+
+    o->sprite_n = 0;
+    o->sprite1 = al_load_bitmap(sprite1_fn);
+    o->sprite2 = al_load_bitmap(sprite2_fn);
+    if (!o->sprite1 || !o->sprite2)
+        die("couldn't load sprites for objects[%d]\n", object_n);
+
+    reset_object_physics(o, object_n);
+}
+
+void reset_object_physics(object *o, int object_n)
 {
     o->x_pos = o->y_pos = o->x_vel = o->y_vel = o->x_acc = o->y_acc = 0;
     o->destroyed = 0; o->timer = 0;
@@ -10,6 +34,8 @@ void reset_object(object *o, int object_n)
     switch (object_n) {
         case APPLE:
             o->x_pos = CANVAS_WIDTH/2; o->y_pos = CANVAS_HEIGHT/4;
+            o->x_vel = 5;
+            o->x_acc = 0.05;
             break;
 
         case PROJECTILE:
@@ -74,17 +100,20 @@ void simulate_world(object *objects, float audio_level)
     for (i = 0; i < LAST_OBJECT; i++) {
         object *o = &objects[i];
         if (i == APPLE)
-            o->y_acc = G - audio_level/2;
+            o->y_acc = G - 2*audio_level;
 
         o->x_vel += o->x_acc;
         o->y_vel += o->y_acc;
 
-        o->x_pos += o->x_vel;
+        // display is fixed wrt apple
+        if (i != APPLE)
+            o->x_pos += o->x_vel;
         o->y_pos += o->y_vel;
         //printf("%f %f\n", o->x_pos, o->y_pos);
 
-        if (i != APPLE && ! objects[APPLE].destroyed && check_collision(o, &objects[APPLE])) {
-            printf("CRUSHA\n");
+        if (i != APPLE &&
+            ! objects[APPLE].destroyed &&
+            check_collision(o, &objects[APPLE])) {
             objects[APPLE].destroyed = 1;
             objects[APPLE].timer = 1;
         }
@@ -106,29 +135,41 @@ void simulate_world(object *objects, float audio_level)
             o->timer = 0;
             o->destroyed = 0;
             
-            reset_object(o, i);
+            reset_object_physics(o, i);
         }
 
     }
 }
 
-/*void rotate_ground(ALLEGRO_BITMAP *ground)
+void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
 {
     int width = al_get_bitmap_width(ground);
     int height = al_get_bitmap_height(ground);
-    al_lock_bitmap
-    // set target bitmap
+    ALLEGRO_COLOR *saved;
 
-    int y, i;
+    al_lock_bitmap(ground,
+                   ALLEGRO_PIXEL_FORMAT_ANY,    // pixel format
+                   ALLEGRO_LOCK_READWRITE);     // mode
+    al_set_target_bitmap(ground);
+    saved = malloc(sizeof(ALLEGRO_COLOR) * amount);
+
+    int y, x;
     for (y = 0; y < height; y++) {
-        ALLEGRO_COLOR pix0 = al_get_pixel(ground, 0, y);
-        for (i = 0; i < width-2; i++)
-            al_put_pixel(i, y, al_get_pixel(ground, i+1, y))
-        al_put_pixel(width-1, y, pix0);
+        // save the pixels on the left, to rotate round later
+        for (x = 0; x < amount; x++)
+            saved[x] = al_get_pixel(ground, x, y);
+        // shift pixels to the left
+        for (x = 0; x < width-amount; x++)
+            al_put_pixel(x, y, al_get_pixel(ground, x+amount, y));
+        // stick the saved first pixel back on the end
+        for (x = width-amount; x < width; x++)
+            al_put_pixel(x, y, saved[x-(width-amount)]);
     }
 
-    al_unlock_bitmap
-}*/
+    al_unlock_bitmap(ground);
+
+    al_set_target_bitmap(al_get_backbuffer(display));
+}
 
 void draw_world(object *objects, ALLEGRO_BITMAP *ground, int animate_timer)
 {

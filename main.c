@@ -54,7 +54,7 @@ int main(void)
         al_init();
         al_init_image_addon();
         for (i = 0; i < LAST_OBJECT; i++) {
-            reset_object(&objects[i], i);
+            init_object(&objects[i], i);
             objects[i].sprite_n = 0;
             objects[i].sprite1 = al_load_bitmap("newton1.png");
             objects[i].sprite2 = al_load_bitmap("newton2.png");
@@ -92,6 +92,7 @@ int main(void)
         else if (ev.type == ALLEGRO_EVENT_TIMER) {
             simulate_world(objects, audio_level);
             draw_world(objects, ground, animate_timer);
+            rotate_ground(ground, display, objects[APPLE].x_vel);
 
             animate_timer++;
         }
