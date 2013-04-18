@@ -45,6 +45,72 @@ int record_callback(const void *inputBuffer, void *outputBuffer,
     return 0;
 }
 
+void show_gameover(int score, ALLEGRO_FONT *font)
+{
+    char score_str[20];
+    int font_line_height = al_get_font_line_height(font);
+
+    sprintf(score_str, "Final score: %d", score);
+
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - 2*font_line_height,
+                 ALLEGRO_ALIGN_CENTRE, score_str);
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - font_line_height,
+                 ALLEGRO_ALIGN_CENTRE, "Play again? :)");
+
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 CANVAS_WIDTH * 2.0/6, CANVAS_HEIGHT/2 + font_line_height,
+                 ALLEGRO_ALIGN_CENTRE, "Ja!");
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 CANVAS_WIDTH * 4.0/6, CANVAS_HEIGHT/2 + font_line_height,
+                 ALLEGRO_ALIGN_CENTRE, "Nein!");
+}
+
+void show_titlescreen(ALLEGRO_FONT *font, object *newton)
+{
+    const int min_x = CANVAS_WIDTH * 1.0/4;
+    const int max_x = CANVAS_WIDTH * 3.0/4;
+    static int x = min_x;
+    static int direction = 0;   // 0 = right, 1 = left
+    static int animate_timer = 0;
+    static int sprite_n = 0;
+    ALLEGRO_BITMAP *sprite;
+    int font_line_height = al_get_font_line_height(font);
+
+    if (direction == 0 && x == max_x)
+        direction = !direction;
+    else if (direction == 1 && x == min_x)
+        direction = !direction;
+
+    if (direction == 0)
+        x += 2;
+    else
+        x -= 2;
+
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 CANVAS_WIDTH/2, CANVAS_HEIGHT * 1/3.0,
+                 ALLEGRO_ALIGN_CENTRE,
+                 "Newton's Apple");
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 CANVAS_WIDTH/2, CANVAS_HEIGHT * 1/3.0 + font_line_height,
+                 ALLEGRO_ALIGN_CENTRE,
+                 "Tap to play!");
+
+    if (animate_timer % 5 == 0)
+        sprite_n = !sprite_n;
+    if (sprite_n == 0)
+        sprite = newton->sprite1;
+    else
+        sprite = newton->sprite2;
+    al_draw_bitmap(sprite,
+                   x, CANVAS_HEIGHT * 3.0/4,
+                   0);
+
+    animate_timer++;
+}
+
 int main(void)
 {
     ALLEGRO_DISPLAY *display = NULL;
@@ -54,11 +120,11 @@ int main(void)
     ALLEGRO_FONT *font;
     PaStream *audio_stream;
     float audio_level = 0;
-    object objects[3];
+    object objects[LAST_OBJECT];
     int animate_timer = 0;
     int score = 0;
     int lives = 1;
-    int scene = GAME;
+    int scene = TITLE;
     int font_line_height;
 
     // initialisation
@@ -70,14 +136,8 @@ int main(void)
         al_init_font_addon();
         al_init_ttf_addon();
         al_install_mouse();
-        for (i = 0; i < LAST_OBJECT; i++) {
+        for (i = 0; i < LAST_OBJECT; i++)
             init_object(&objects[i], i);
-            objects[i].sprite_n = 0;
-            objects[i].sprite1 = al_load_bitmap("newton1.png");
-            objects[i].sprite2 = al_load_bitmap("newton2.png");
-            if (!objects[i].sprite1 || !objects[i].sprite2)
-                die("couldn't load sprites for objects[%d]\n", i);
-        }
         ground = al_load_bitmap("ground.png");
         font = al_load_ttf_font("Arial.ttf", 36, 0);    // last arg is flags
         font_line_height = al_get_font_line_height(font);
@@ -114,17 +174,21 @@ int main(void)
         if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             break;
         else if (ev.type == ALLEGRO_EVENT_TIMER) {
-            if (scene == TITLE)
-                ;// do stuff
-            else if (scene == GAME) {   // main game
-                if (simulate_world(objects, audio_level))
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+
+            if (scene == TITLE) {
+                show_titlescreen(font, &objects[3]);
+            } else if (scene == GAME) {   // main game
+                if (simulate_objects(objects, audio_level))
                     lives--;
                 if (lives == 0) {
                     scene = GAMEOVER;
                     continue;
                 }
                 rotate_ground(ground, display, objects[APPLE].x_vel);
-                draw_world(objects, ground, animate_timer);
+                // TODO remove the offset?
+                draw_objects(objects, 0, animate_timer);
+                al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
                 animate_timer++;
 
                 score += (int) round(objects[APPLE].x_vel);
@@ -137,31 +201,24 @@ int main(void)
                 al_draw_text(font, al_map_rgb(255,255,255),
                              10, 10+font_line_height,
                              ALLEGRO_ALIGN_LEFT, lives_str);
-            } else if (scene == GAMEOVER) {
-                sprintf(score_str, "Final score: %d", score);
-
-                al_clear_to_color(al_map_rgb(0, 0, 0));
-                al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - 2*font_line_height,
-                             ALLEGRO_ALIGN_CENTRE, score_str);
-                al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - font_line_height,
-                             ALLEGRO_ALIGN_CENTRE, "Play again? :)");
-
-                al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH * 2.0/6, CANVAS_HEIGHT/2 + font_line_height,
-                             ALLEGRO_ALIGN_CENTRE, "Ja!");
-                al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH * 4.0/6, CANVAS_HEIGHT/2 + font_line_height,
-                             ALLEGRO_ALIGN_CENTRE, "Nein!");
-            }
+            } else if (scene == GAMEOVER)
+                show_gameover(score, font);
             
             al_flip_display();
         } else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && scene == GAMEOVER) {
-            lives = 3;
-            score = 0;
+            ALLEGRO_MOUSE_STATE m_state;
+            al_get_mouse_state(&m_state);
+            int x = m_state.x;
+
+            if (x < CANVAS_WIDTH/2.0) {
+                // TODO: reset physics
+                lives = 3;
+                score = 0;
+                scene = GAME;
+            } else
+                break;
+        } else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && scene == TITLE) {
             scene = GAME;
-            // TODO: reset physics
         }
     }
     

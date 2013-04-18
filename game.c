@@ -12,6 +12,7 @@ void init_object(object *o, int object_n)
         case BIRD:
             //break;
         case APPLE:
+        default:
             strcpy(sprite1_fn, "newton1.png");
             strcpy(sprite2_fn, "newton2.png");
             //break;
@@ -95,7 +96,7 @@ int check_collision(object *o1, object *o2)
 }
 
 // returns 1 if apple was hit, otherwise 0
-int simulate_world(object *objects, float audio_level)
+int simulate_objects(object *objects, float audio_level)
 {
     enum object_ctr i;
     for (i = 0; i < LAST_OBJECT; i++) {
@@ -182,12 +183,12 @@ void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
     al_set_target_bitmap(al_get_backbuffer(display));
 }
 
-void draw_world(object *objects, ALLEGRO_BITMAP *ground, int animate_timer)
+// draw objects at <offset> pixels from the bottom
+void draw_objects(object *objects, int offset, int animate_timer)
 {
     enum object_ctr i;
     int flip_sprites = animate_timer % ANIMATE_TIME == 0;
 
-    al_clear_to_color(al_map_rgb(0, 0, 0));
     for (i = 0; i < LAST_OBJECT; i++) {
         object *o = &objects[i];
 
@@ -201,6 +202,4 @@ void draw_world(object *objects, ALLEGRO_BITMAP *ground, int animate_timer)
                 al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);    // dx, dy, flags (delta because relative to curr-> pos->)
         }
     }
-
-    al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
 }

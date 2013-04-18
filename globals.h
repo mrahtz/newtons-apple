@@ -9,6 +9,7 @@ enum object_ctr
     APPLE,
     PROJECTILE,
     BIRD,
+    NEWTON,
     LAST_OBJECT
 };
 
