@@ -184,8 +184,9 @@ void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
 }
 
 // draw objects at <offset> pixels from the bottom
-void draw_objects(object *objects, int offset, int animate_timer)
+void draw_objects(object *objects, int offset)
 {
+    static int animate_timer = 0;
     enum object_ctr i;
     int flip_sprites = animate_timer % ANIMATE_TIME == 0;
 
@@ -202,4 +203,6 @@ void draw_objects(object *objects, int offset, int animate_timer)
                 al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);    // dx, dy, flags (delta because relative to curr-> pos->)
         }
     }
+
+    animate_timer++;
 }

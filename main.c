@@ -121,7 +121,6 @@ int main(void)
     PaStream *audio_stream;
     float audio_level = 0;
     object objects[LAST_OBJECT];
-    int animate_timer = 0;
     int score = 0;
     int lives = 1;
     int scene = TITLE;
@@ -187,9 +186,8 @@ int main(void)
                 }
                 rotate_ground(ground, display, objects[APPLE].x_vel);
                 // TODO remove the offset?
-                draw_objects(objects, 0, animate_timer);
+                draw_objects(objects, 0);
                 al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
-                animate_timer++;
 
                 score += (int) round(objects[APPLE].x_vel);
                 sprintf(score_str, "Score: %d", score);
