@@ -69,6 +69,7 @@ int main(void)
         al_init_image_addon();
         al_init_font_addon();
         al_init_ttf_addon();
+        al_install_mouse();
         for (i = 0; i < LAST_OBJECT; i++) {
             init_object(&objects[i], i);
             objects[i].sprite_n = 0;
@@ -98,6 +99,8 @@ int main(void)
             die("couldn't create timer\n");
         al_register_event_source(event_queue, al_get_timer_event_source(timer));
         al_start_timer(timer);
+
+        al_register_event_source(event_queue, al_get_mouse_event_source());
 
         audio_stream = portaudio_init(record_callback, &audio_level);
     }
@@ -139,21 +142,26 @@ int main(void)
 
                 al_clear_to_color(al_map_rgb(0, 0, 0));
                 al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - font_line_height,
+                             CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - 2*font_line_height,
                              ALLEGRO_ALIGN_CENTRE, score_str);
                 al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH/2, CANVAS_HEIGHT/2,
+                             CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - font_line_height,
                              ALLEGRO_ALIGN_CENTRE, "Play again? :)");
 
                 al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH * 2.0/6, CANVAS_HEIGHT/2 + 2*font_line_height,
+                             CANVAS_WIDTH * 2.0/6, CANVAS_HEIGHT/2 + font_line_height,
                              ALLEGRO_ALIGN_CENTRE, "Ja!");
                 al_draw_text(font, al_map_rgb(255,255,255),
-                             CANVAS_WIDTH * 4.0/6, CANVAS_HEIGHT/2 + 2*font_line_height,
+                             CANVAS_WIDTH * 4.0/6, CANVAS_HEIGHT/2 + font_line_height,
                              ALLEGRO_ALIGN_CENTRE, "Nein!");
             }
             
             al_flip_display();
+        } else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && scene == GAMEOVER) {
+            lives = 3;
+            score = 0;
+            scene = GAME;
+            // TODO: reset physics
         }
     }
     
