@@ -94,7 +94,8 @@ int check_collision(object *o1, object *o2)
         return 0;
 }
 
-void simulate_world(object *objects, float audio_level)
+// returns 1 if apple was hit, otherwise 0
+int simulate_world(object *objects, float audio_level)
 {
     enum object_ctr i;
     for (i = 0; i < LAST_OBJECT; i++) {
@@ -106,7 +107,9 @@ void simulate_world(object *objects, float audio_level)
         o->y_vel += o->y_acc;
 
         // display is fixed wrt apple
-        if (i != APPLE)
+        if (i == BIRD)
+            o->x_pos += (o->x_vel - objects[APPLE].x_vel);
+        else if (i != APPLE)
             o->x_pos += o->x_vel;
         o->y_pos += o->y_vel;
         //printf("%f %f\n", o->x_pos, o->y_pos);
@@ -121,8 +124,7 @@ void simulate_world(object *objects, float audio_level)
         if (i == APPLE && o->y_pos < 0) {
             o->y_pos = 0;
             o->y_vel = 0;
-        } else if (check_if_offscreen(o) && ! o->destroyed)
-        {
+        } else if (check_if_offscreen(o) && ! o->destroyed) {
             //printf("OVERKILLL\n");
             o->destroyed = 1;
             o->timer = 1;
@@ -137,8 +139,13 @@ void simulate_world(object *objects, float audio_level)
             
             reset_object_physics(o, i);
         }
-
     }
+
+    // apple has just been destroyed
+    if (objects[APPLE].timer == 1)
+        return 1;
+    else
+        return 0;
 }
 
 void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
@@ -146,6 +153,10 @@ void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
     int width = al_get_bitmap_width(ground);
     int height = al_get_bitmap_height(ground);
     ALLEGRO_COLOR *saved;
+
+    // if rotating more than the width,
+    // only rotate the different between the amount and the width
+    amount %= width+1;
 
     al_lock_bitmap(ground,
                    ALLEGRO_PIXEL_FORMAT_ANY,    // pixel format
@@ -190,7 +201,6 @@ void draw_world(object *objects, ALLEGRO_BITMAP *ground, int animate_timer)
                 al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);    // dx, dy, flags (delta because relative to curr-> pos->)
         }
     }
-    al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
 
-    al_flip_display();
+    al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
 }
