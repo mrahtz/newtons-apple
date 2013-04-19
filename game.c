@@ -2,7 +2,9 @@
 #include "game.h"
 #include "helpers.h"
 
-void init_object(object *o, int object_n)
+const float G = 0.1;
+
+void init_sprite(object *o, int object_n)
 {
     char sprite1_fn[20], sprite2_fn[20];
 
@@ -22,20 +24,17 @@ void init_object(object *o, int object_n)
     o->sprite2 = al_load_bitmap(sprite2_fn);
     if (!o->sprite1 || !o->sprite2)
         die("couldn't load sprites for objects[%d]\n", object_n);
-
-    reset_object_physics(o, object_n);
 }
 
 void reset_object_physics(object *o, int object_n)
 {
     o->x_pos = o->y_pos = o->x_vel = o->y_vel = o->x_acc = o->y_acc = 0;
-    o->destroyed = 0; o->timer = 0;
 
     switch (object_n) {
         case APPLE:
             o->x_pos = CANVAS_WIDTH/2; o->y_pos = CANVAS_HEIGHT/4;
             o->x_vel = 5;
-            o->x_acc = 0.05;
+            o->x_acc = 0.01;
             break;
 
         case PROJECTILE:
@@ -51,7 +50,7 @@ void reset_object_physics(object *o, int object_n)
         case BIRD:
             o->x_pos = CANVAS_WIDTH-1;
             o->y_pos = rand_between(0, CANVAS_HEIGHT/2);
-            o->x_vel = -3;
+            o->x_vel = -1;
     }
 }
 
@@ -98,14 +97,26 @@ int check_collision(const object *o1, const object *o2)
 int simulate_objects(object *objects, const float audio_level)
 {
     enum object_ctr i;
+
     for (i = 0; i < LAST_OBJECT; i++) {
         object *o = &objects[i];
+
+        // handle respawn timing
+        if  (o->timer != 0)
+            o->timer -= 1;
+        else if (o->destroyed && o->timer == 0) {
+            o->timer = 0;
+            o->destroyed = 0;
+            reset_object_physics(o, i);
+        }
+        if (o->destroyed)
+            continue;
+
         if (i == APPLE)
             o->y_acc = G - 2*audio_level;
 
         o->x_vel += o->x_acc;
         o->y_vel += o->y_acc;
-
         // display is fixed wrt apple
         if (i == BIRD)
             o->x_pos += (o->x_vel - objects[APPLE].x_vel);
@@ -114,35 +125,25 @@ int simulate_objects(object *objects, const float audio_level)
         o->y_pos += o->y_vel;
         //printf("%f %f\n", o->x_pos, o->y_pos);
 
-        if (i != APPLE &&
-            ! objects[APPLE].destroyed &&
-            check_collision(o, &objects[APPLE])) {
+        if (i != APPLE && 
+                //!objects[APPLE].destroyed &&
+                check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;
-            objects[APPLE].timer = 1;
+            objects[APPLE].timer = objects[APPLE].respawn_interval;
         }
 
         if (i == APPLE && o->y_pos < 0) {
-            o->y_pos = 0;
+            o->y_pos = 0; // cap the apple at the top of the screen
             o->y_vel = 0;
-        } else if (check_if_offscreen(o) && ! o->destroyed) {
-            //printf("OVERKILLL\n");
-            o->destroyed = 1;
-            o->timer = 1;
         }
-
-        if (o->timer != 0)
-            o->timer += 1;
-        if (o->timer == PROJ_INTERVAL) {
-            //printf("RESPAWNNNNN\n");
-            o->timer = 0;
-            o->destroyed = 0;
-            
-            reset_object_physics(o, i);
+        if (check_if_offscreen(o) == 1 && ! o->destroyed) {
+            o->destroyed = 1;
+            o->timer = o->respawn_interval;
         }
     }
 
     // apple has just been destroyed
-    if (objects[APPLE].timer == 1)
+    if (objects[APPLE].timer == objects[APPLE].respawn_interval)
         return 1;
     else
         return 0;

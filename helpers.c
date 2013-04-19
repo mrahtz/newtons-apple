@@ -9,6 +9,20 @@ void check_pa_err(char *where, PaError err)
     }
 }
 
+void load_respawn(object *o, int n)
+{
+    switch(n) {
+        case APPLE:
+            o->respawn_interval = APPLE_RESPAWN_INTERVAL;
+            break;
+        case PROJECTILE:
+            o->respawn_interval = PROJECTILE_RESPAWN_INTERVAL;
+            break;
+        case BIRD:
+            o->respawn_interval = BIRD_RESPAWN_INTERVAL;
+            break;
+    }
+}
 
 PaStream * portaudio_init(PaStreamCallback *callback, float *data)
 {

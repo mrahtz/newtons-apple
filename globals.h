@@ -4,6 +4,27 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 
+enum game_scenes
+{
+    TITLE,
+    INTRO,
+    GAME,
+    GAMEOVER
+};
+
+enum
+{
+    CANVAS_WIDTH = 640,
+    CANVAS_HEIGHT = 480,
+    MIN_PROJ_VEL = 5,
+    MAX_PROJ_VEL = 10,
+    ANIMATE_TIME = 30,
+    INIT_SPAWN_INTERVAL = 120,
+    APPLE_RESPAWN_INTERVAL = 30,
+    PROJECTILE_RESPAWN_INTERVAL = 120,
+    BIRD_RESPAWN_INTERVAL = 110
+};
+
 enum object_ctr
 {
     APPLE,
@@ -22,14 +43,7 @@ typedef struct
     float x_pos, y_pos; // position
     int destroyed;      // whether the object should be drawn
     int timer;          // time since object destroyed (0 = don't count)
+    int respawn_interval;
 } object;
-
-extern const float G;
-extern const int CANVAS_WIDTH;
-extern const int CANVAS_HEIGHT;
-extern const int PROJ_INTERVAL;
-extern const int MIN_PROJ_VEL;
-extern const int MAX_PROJ_VEL;
-extern const int ANIMATE_TIME;
 
 #endif
