@@ -96,7 +96,7 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
     al_draw_text(font, al_map_rgb(255,255,255),
                  CANVAS_WIDTH/2, CANVAS_HEIGHT * 1/3.0 + font_line_height,
                  ALLEGRO_ALIGN_CENTRE,
-                 "Tap to play!");
+                 "Click to play!");
 
     if (animate_timer % 5 == 0)
         sprite_n = !sprite_n;
@@ -111,6 +111,41 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
     animate_timer++;
 }
 
+// al_draw_bitmap doesn't take consts so can't const their parameters :(
+void draw_game(const object *objects,
+               ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *ground, ALLEGRO_FONT *font,
+               const int score, const int lives)
+{
+    char lives_str[20], score_str[20];
+    int font_line_height = al_get_font_line_height(font);
+
+    rotate_ground(ground, display, objects[APPLE].x_vel);
+    al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
+    // TODO remove the offset?
+    draw_objects(objects, 0);
+
+    sprintf(score_str, "Score: %d", score);
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 10, 10,
+                 ALLEGRO_ALIGN_LEFT, score_str);
+
+    sprintf(lives_str, "Lives left: %d", lives);
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 10, 10+font_line_height,
+                 ALLEGRO_ALIGN_LEFT, lives_str);
+}
+
+int game_tick(object *objects, const float audio_level, int *lives, int *score)
+{
+    if (simulate_objects(objects, audio_level)) {
+        (*lives)--;
+    } if (*lives == 0)
+        return 1;
+    *score += (int) objects[APPLE].x_vel;
+
+    return 0;
+}
+
 int main(void)
 {
     ALLEGRO_DISPLAY *display = NULL;
@@ -119,12 +154,12 @@ int main(void)
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *font;
     PaStream *audio_stream;
-    float audio_level = 0;
     object objects[LAST_OBJECT];
-    int score = 0;
-    int lives = 1;
+    float audio_level = 0;
     int scene = TITLE;
     int font_line_height;
+    int score = 0;
+    int lives = 1;
 
     // initialisation
     {
@@ -135,30 +170,28 @@ int main(void)
         al_init_font_addon();
         al_init_ttf_addon();
         al_install_mouse();
+
         for (i = 0; i < LAST_OBJECT; i++)
             init_object(&objects[i], i);
         ground = al_load_bitmap("ground.png");
-        font = al_load_ttf_font("Arial.ttf", 36, 0);    // last arg is flags
-        font_line_height = al_get_font_line_height(font);
+
+        font = al_load_ttf_font("Arial.ttf",
+                                36,     // size
+                                0);     // flags
         if (!font)
             die("couldn't load font\n");
+        font_line_height = al_get_font_line_height(font);
 
         display = al_create_display(CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        /*if (!newton) {
-            printf("oh no!\n");
-            return 1;
-        }*/
-
         event_queue = al_create_event_queue();
-        al_register_event_source(event_queue, al_get_display_event_source(display));
         // TODO free this timer?
         timer = al_create_timer(1/60.0);
         if (!timer)
             die("couldn't create timer\n");
-        al_register_event_source(event_queue, al_get_timer_event_source(timer));
         al_start_timer(timer);
 
+        al_register_event_source(event_queue, al_get_display_event_source(display));
+        al_register_event_source(event_queue, al_get_timer_event_source(timer));
         al_register_event_source(event_queue, al_get_mouse_event_source());
 
         audio_stream = portaudio_init(record_callback, &audio_level);
@@ -168,55 +201,40 @@ int main(void)
     while (1) {
         ALLEGRO_EVENT ev;
         al_wait_for_event(event_queue, &ev);
-        char score_str[20], lives_str[20];
 
         if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             break;
-        else if (ev.type == ALLEGRO_EVENT_TIMER) {
+        else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+            if (scene == TITLE)
+                scene = GAME;
+            else if (scene == GAMEOVER) {
+                ALLEGRO_MOUSE_STATE m_state;
+                al_get_mouse_state(&m_state);
+                int x = m_state.x;
+
+                if (x < CANVAS_WIDTH/2.0) {
+                    // TODO: reset physics
+                    lives = 1;
+                    score = 0;
+                    scene = GAME;
+                } else
+                    break;
+            }
+        } else if (ev.type == ALLEGRO_EVENT_TIMER) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
 
-            if (scene == TITLE) {
+            if (scene == TITLE)
                 show_titlescreen(font, &objects[3]);
-            } else if (scene == GAME) {   // main game
-                if (simulate_objects(objects, audio_level))
-                    lives--;
-                if (lives == 0) {
-                    scene = GAMEOVER;
-                    continue;
-                }
-                rotate_ground(ground, display, objects[APPLE].x_vel);
-                // TODO remove the offset?
-                draw_objects(objects, 0);
-                al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
-
-                score += (int) round(objects[APPLE].x_vel);
-                sprintf(score_str, "Score: %d", score);
-                al_draw_text(font, al_map_rgb(255,255,255),
-                             10, 10,
-                             ALLEGRO_ALIGN_LEFT, score_str);
-
-                sprintf(lives_str, "Lives left: %d", lives);
-                al_draw_text(font, al_map_rgb(255,255,255),
-                             10, 10+font_line_height,
-                             ALLEGRO_ALIGN_LEFT, lives_str);
-            } else if (scene == GAMEOVER)
+            else if (scene == GAMEOVER)
                 show_gameover(score, font);
+            else if (scene == GAME) {   // main game
+                int gameover = game_tick(objects, audio_level, &lives, &score);
+                if (gameover == 1)
+                    scene = GAMEOVER;
+                draw_game(objects, display, ground, font, score, lives);
+            }
             
             al_flip_display();
-        } else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && scene == GAMEOVER) {
-            ALLEGRO_MOUSE_STATE m_state;
-            al_get_mouse_state(&m_state);
-            int x = m_state.x;
-
-            if (x < CANVAS_WIDTH/2.0) {
-                // TODO: reset physics
-                lives = 3;
-                score = 0;
-                scene = GAME;
-            } else
-                break;
-        } else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN && scene == TITLE) {
-            scene = GAME;
         }
     }
     

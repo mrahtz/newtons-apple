@@ -15,7 +15,6 @@ enum object_ctr
 
 typedef struct
 {
-    int sprite_n;
     ALLEGRO_BITMAP *sprite1;
     ALLEGRO_BITMAP *sprite2;
     float x_acc, y_acc; // acceleration

@@ -18,7 +18,6 @@ void init_object(object *o, int object_n)
             //break;
     }
 
-    o->sprite_n = 0;
     o->sprite1 = al_load_bitmap(sprite1_fn);
     o->sprite2 = al_load_bitmap(sprite2_fn);
     if (!o->sprite1 || !o->sprite2)
@@ -56,7 +55,7 @@ void reset_object_physics(object *o, int object_n)
     }
 }
 
-int check_if_offscreen(object *o)
+int check_if_offscreen(const object *o)
 {
     int o_width = al_get_bitmap_width(o->sprite1);
     int o_height = al_get_bitmap_height(o->sprite1);
@@ -69,7 +68,7 @@ int check_if_offscreen(object *o)
     return offscreen_x || offscreen_y;
 }
 
-int check_collision(object *o1, object *o2)
+int check_collision(const object *o1, const object *o2)
 {
     // half-dimensions of object 1
     int o1_hwidth = al_get_bitmap_width(o1->sprite1)/2;
@@ -96,7 +95,7 @@ int check_collision(object *o1, object *o2)
 }
 
 // returns 1 if apple was hit, otherwise 0
-int simulate_objects(object *objects, float audio_level)
+int simulate_objects(object *objects, const float audio_level)
 {
     enum object_ctr i;
     for (i = 0; i < LAST_OBJECT; i++) {
@@ -180,28 +179,30 @@ void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
 
     al_unlock_bitmap(ground);
 
-    al_set_target_bitmap(al_get_backbuffer(display));
+    al_set_target_backbuffer(display);
 }
 
 // draw objects at <offset> pixels from the bottom
-void draw_objects(object *objects, int offset)
+void draw_objects(const object *objects, const int offset)
 {
     static int animate_timer = 0;
+    static int sprite_n = 0;
     enum object_ctr i;
-    int flip_sprites = animate_timer % ANIMATE_TIME == 0;
+
+    if (animate_timer % ANIMATE_TIME == 0)
+        sprite_n = !sprite_n;
 
     for (i = 0; i < LAST_OBJECT; i++) {
-        object *o = &objects[i];
+        const object *o = &objects[i];
 
-        if (flip_sprites)
-            o->sprite_n = !(o->sprite_n);
-        if (! o->destroyed) {
-            if (o->sprite_n == 0) {
-                // dx, dy, flags (delta because relative to current postion)
-                al_draw_bitmap(o->sprite1, (int) o->x_pos, (int) o->y_pos, 0);
-            } else
-                al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);    // dx, dy, flags (delta because relative to curr-> pos->)
-        }
+        if (o->destroyed)
+            continue;
+
+        if (sprite_n == 0) {
+            // dx, dy, flags (delta because relative to current postion)
+            al_draw_bitmap(o->sprite1, (int) o->x_pos, (int) o->y_pos, 0);
+        } else
+            al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);    // dx, dy, flags (delta because relative to curr-> pos->)
     }
 
     animate_timer++;
