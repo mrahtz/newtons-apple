@@ -16,10 +16,10 @@ void load_respawn(object *o, int n)
             o->respawn_interval = APPLE_RESPAWN_INTERVAL;
             break;
         case PROJECTILE:
-            o->respawn_interval = PROJECTILE_RESPAWN_INTERVAL;
+            o->respawn_interval = (int) PROJECTILE_RESPAWN_INTERVAL * rand_between(1.0, 2.0);
             break;
         case BIRD:
-            o->respawn_interval = BIRD_RESPAWN_INTERVAL;
+            o->respawn_interval = (int) BIRD_RESPAWN_INTERVAL * rand_between(1.0, 2.0);
             break;
     }
 }
@@ -46,7 +46,7 @@ PaStream * portaudio_init(PaStreamCallback *callback, float *data)
     return stream;
 }
 
-float rand_between(int min, int max)
+float rand_between(float min, float max)
 {
     int range = max-min;
     float r = (float) rand();

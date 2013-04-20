@@ -6,6 +6,7 @@
 #include <portaudio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "globals.h"
 #include "scenes.h"
@@ -53,6 +54,7 @@ int main(void)
         al_init_font_addon();
         al_init_ttf_addon();
         al_install_mouse();
+        srand(time(NULL));
 
         enum object_ctr i;
         for (i = 0; i < LAST_OBJECT; i++) {

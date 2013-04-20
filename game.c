@@ -126,7 +126,7 @@ int simulate_objects(object *objects, const float audio_level)
         //printf("%f %f\n", o->x_pos, o->y_pos);
 
         if (i != APPLE && 
-                //!objects[APPLE].destroyed &&
+                !objects[APPLE].destroyed &&
                 check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;
             objects[APPLE].timer = objects[APPLE].respawn_interval;

@@ -52,7 +52,7 @@ void init_game(object *objects, int *lives, int *score)
         // give the player some time to get used to things
         if (i != APPLE && i != NEWTON) {
             objects[i].destroyed = 1;
-            objects[i].timer = INIT_SPAWN_INTERVAL;     // TODO randomise
+            objects[i].timer = (int) INIT_SPAWN_INTERVAL * rand_between(1.0, 3.0);     // TODO randomise
         }
     }
     objects[APPLE].destroyed = 0;
