@@ -31,7 +31,10 @@ enum object_ctr
     PROJECTILE,
     BIRD,
     NEWTON,
-    LAST_OBJECT
+    LAST_OBJECT,
+    // after LAST_OBJECT so it's not accessed during the normal 
+    // i < LAST_OBJECT iterations
+    GROUND
 };
 
 typedef struct

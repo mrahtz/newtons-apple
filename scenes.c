@@ -76,14 +76,14 @@ int game_tick(object *objects, const float audio_level, int *lives, int *score)
 
 // al_draw_bitmap doesn't take consts so can't const their parameters :(
 void draw_game(const object *objects,
-               ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *ground, ALLEGRO_FONT *font,
+               ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
                const int score, const int lives)
 {
     char lives_str[20], score_str[20];
     int font_line_height = al_get_font_line_height(font);
 
-    rotate_ground(ground, display, objects[APPLE].x_vel);
-    al_draw_bitmap(ground, 0, CANVAS_HEIGHT-al_get_bitmap_height(ground), 0);
+    rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
+    al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
     // TODO remove the offset?
     draw_objects(objects, 0);
 

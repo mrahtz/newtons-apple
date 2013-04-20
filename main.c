@@ -36,7 +36,6 @@ int main(void)
 {
     ALLEGRO_DISPLAY *display = NULL;
     ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-    ALLEGRO_BITMAP *ground = NULL;
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *font;
     PaStream *audio_stream;
@@ -61,7 +60,10 @@ int main(void)
             init_sprite(&objects[i], i);
             load_respawn(&objects[i], i);
         }
-        ground = al_load_bitmap("ground.png");
+        objects[GROUND].sprite1 = al_load_bitmap("ground.png");
+        objects[GROUND].x_pos = 0;
+        objects[GROUND].y_pos = CANVAS_HEIGHT-1 - 
+                                al_get_bitmap_height(objects[GROUND].sprite1) + 1;
 
         font = al_load_ttf_font("Arial.ttf",
                                 36,     // size
@@ -119,7 +121,7 @@ int main(void)
                 int gameover = game_tick(objects, audio_level, &lives, &score);
                 if (gameover == 1)
                     scene = GAMEOVER;
-                draw_game(objects, display, ground, font, score, lives);
+                draw_game(objects, display, font, score, lives);
             }
             
             al_flip_display();

@@ -71,6 +71,7 @@ void free_resources(ALLEGRO_DISPLAY *display, object *objects, ALLEGRO_EVENT_QUE
         al_destroy_bitmap(objects[i].sprite1);
         al_destroy_bitmap(objects[i].sprite2);
     }
+    // TODO what about the ground bitmap?
     al_destroy_event_queue(event_queue);
 
     // portaudio stuff
