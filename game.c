@@ -9,11 +9,13 @@ void init_sprite(object *o, int object_n)
     char sprite1_fn[20], sprite2_fn[20];
 
     switch (object_n) {
+        case APPLE:
+            strcpy(sprite1_fn, "apple.png");
+            strcpy(sprite2_fn, "apple.png");
+            break;
         case PROJECTILE:
             //break;
         case BIRD:
-            //break;
-        case APPLE:
             //break;
         case NEWTON:
         default:

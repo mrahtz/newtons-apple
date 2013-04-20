@@ -111,7 +111,7 @@ int main(void)
                     break;
             }
         } else if (ev.type == ALLEGRO_EVENT_TIMER) {
-            al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_clear_to_color(al_map_rgb(135, 206, 235));
 
             if (scene == TITLE)
                 show_titlescreen(font, &objects[3]);

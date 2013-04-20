@@ -37,8 +37,8 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
     else
         sprite = newton->sprite2;
     al_draw_bitmap(sprite,
-                   x, CANVAS_HEIGHT * 3.0/4,
-                   0);
+                   x, CANVAS_HEIGHT * 4.0/6,
+                   direction == 1 ? ALLEGRO_FLIP_HORIZONTAL : 0);   // flags
 
     animate_timer++;
 }
