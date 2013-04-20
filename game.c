@@ -93,6 +93,15 @@ int check_collision(const object *o1, const object *o2)
         return 0;
 }
 
+int check_ground_collision(object *o, object *ground)
+{
+    int object_height = al_get_bitmap_height(o->sprite1);
+    int object_bottom_y = o->y_pos + object_height - 1;
+    int collided = object_bottom_y >= ground->y_pos;
+
+    return collided;
+}
+
 // returns 1 if apple was hit, otherwise 0
 int simulate_objects(object *objects, const float audio_level)
 {
@@ -136,12 +145,13 @@ int simulate_objects(object *objects, const float audio_level)
             o->y_pos = 0; // cap the apple at the top of the screen
             o->y_vel = 0;
         }
-        if (check_if_offscreen(o) == 1 && ! o->destroyed) {
+        if (!o->destroyed &&
+            (check_if_offscreen(o) == 1 ||
+             check_ground_collision(o, &objects[GROUND]) == 1) ) {
             o->destroyed = 1;
             o->timer = o->respawn_interval;
         }
     }
-
     // apple has just been destroyed
     if (objects[APPLE].timer == objects[APPLE].respawn_interval)
         return 1;
