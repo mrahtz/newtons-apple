@@ -57,8 +57,8 @@ void init_game(object *objects, int *lives, int *score)
     }
     objects[APPLE].destroyed = 0;
     objects[APPLE].timer = 0;
-    reset_object_physics(&objects[APPLE], APPLE);
-    reset_object_physics(&objects[NEWTON], NEWTON);
+    reset_object_physics(objects, APPLE);
+    reset_object_physics(objects, NEWTON);
 }
 
 int game_tick(object *objects, const float audio_level, int *lives, int *score)
