@@ -84,8 +84,7 @@ void draw_game(const object *objects,
 
     rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
     al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
-    // TODO remove the offset?
-    draw_objects(objects, 0);
+    draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // animate faster as apple goes faster
 
     sprintf(score_str, "Score: %d", score);
     al_draw_text(font, al_map_rgb(255,255,255),

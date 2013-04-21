@@ -151,7 +151,7 @@ int simulate_objects(object *objects, const float audio_level)
         //printf("%f %f\n", o->x_pos, o->y_pos);
 
         if (i != APPLE && 
-                !objects[APPLE].destroyed &&
+                !objects[APPLE].destroyed && 0) {
                 check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;
             objects[APPLE].timer = objects[APPLE].respawn_interval;
@@ -209,14 +209,13 @@ void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
     al_set_target_backbuffer(display);
 }
 
-// draw objects at <offset> pixels from the bottom
-void draw_objects(const object *objects, const int offset)
+void draw_objects(const object *objects, int animate_time)
 {
     static int animate_timer = 0;
     static int sprite_n = 0;
     enum object_ctr i;
 
-    if (animate_timer % ANIMATE_TIME == 0)
+    if (animate_timer % animate_time == 0)
         sprite_n = !sprite_n;
 
     for (i = 0; i < LAST_OBJECT; i++) {
