@@ -13,14 +13,18 @@ void init_sprite(object *o, int object_n)
             strcpy(sprite1_fn, "apple.png");
             strcpy(sprite2_fn, "apple.png");
             break;
-        case PROJECTILE:
-            //break;
         case BIRD:
-            //break;
+            strcpy(sprite1_fn, "bird1.png");
+            strcpy(sprite2_fn, "bird2.png");
+            break;
+        case PROJECTILE:
+            strcpy(sprite1_fn, "book.png");
+            strcpy(sprite2_fn, "book.png");
+            break;
         case NEWTON:
-        default:
             strcpy(sprite1_fn, "newton1.png");
             strcpy(sprite2_fn, "newton2.png");
+            o->sprite3 = al_load_bitmap("newton_asleep.png");
             //break;
     }
 
@@ -39,7 +43,7 @@ void reset_object_physics(object *objects, int object_n)
     switch (object_n) {
         case APPLE:
             o->x_pos = CANVAS_WIDTH/2; o->y_pos = CANVAS_HEIGHT/4;
-            o->x_vel = 5;
+            o->x_vel = APPLE_INIT_VEL;
             o->x_acc = 0.01;
             break;
 
@@ -118,6 +122,17 @@ int check_ground_collision(object *o, object *ground)
     return collided;
 }
 
+void update_physics(object *objects, int n)
+{
+    object *o = &objects[n];
+
+    o->x_vel += o->x_acc;
+    o->y_vel += o->y_acc;
+
+    o->x_pos += o->x_vel;
+    o->y_pos += o->y_vel;
+}
+
 // returns 1 if apple was hit, otherwise 0
 int simulate_objects(object *objects, const float audio_level)
 {
@@ -129,7 +144,7 @@ int simulate_objects(object *objects, const float audio_level)
         // handle respawn timing
         if  (o->timer != 0)
             o->timer -= 1;
-        else if (o->destroyed && o->timer == 0) {
+        else if (o->destroyed && o->timer == 0) {   // time to respawn
             o->timer = 0;
             o->destroyed = 0;
             reset_object_physics(objects, i);
@@ -138,7 +153,7 @@ int simulate_objects(object *objects, const float audio_level)
             continue;
 
         if (i == APPLE)
-            o->y_acc = G - 2*audio_level;
+            o->y_acc = G - 5*audio_level;
 
         o->x_vel += o->x_acc;
         o->y_vel += o->y_acc;
@@ -151,14 +166,14 @@ int simulate_objects(object *objects, const float audio_level)
         //printf("%f %f\n", o->x_pos, o->y_pos);
 
         if (i != APPLE && 
-                !objects[APPLE].destroyed && 0) {
+                !objects[APPLE].destroyed &&
                 check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;
             objects[APPLE].timer = objects[APPLE].respawn_interval;
         }
 
         if (i == APPLE && o->y_pos < 0) {
-            o->y_pos = 0; // cap the apple at the top of the screen
+            o->y_pos = 0; // cap the apple to the top of the screen
             o->y_vel = 0;
         }
         if (!o->destroyed &&

@@ -13,6 +13,7 @@
 #include "game.h"
 #include "helpers.h"
 
+// stores average amplitude of buffer in userData pointer
 int record_callback(const void *inputBuffer, void *outputBuffer,
                     unsigned long framesPerBuffer,
                     const PaStreamCallbackTimeInfo* timeInfo,
@@ -39,12 +40,12 @@ int main(void)
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *font;
     PaStream *audio_stream;
-    object objects[LAST_OBJECT];
+    object objects[OBJECTS_END];
     float audio_level = 0;
-    int scene = TITLE;
-    int font_line_height;
+    int scene = INTRO;
     int score;
     int lives;
+    int tree_x = 0;
 
     // initialisation
     {
@@ -55,6 +56,11 @@ int main(void)
         al_install_mouse();
         srand(time(NULL));
 
+        display = al_create_display(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // though the window pops up for a second with nothing on it,
+        // they have to be loaded after display creation for them to be
+        // loaded into video memory (rather than system memory)
         enum object_ctr i;
         for (i = 0; i < LAST_OBJECT; i++) {
             init_sprite(&objects[i], i);
@@ -62,7 +68,7 @@ int main(void)
         }
         objects[GROUND].sprite1 = al_load_bitmap("ground.png");
         objects[GROUND].x_pos = 0;
-        objects[GROUND].y_pos = CANVAS_HEIGHT-1 - 
+        objects[GROUND].y_pos = CANVAS_HEIGHT-1 -
                                 al_get_bitmap_height(objects[GROUND].sprite1) + 1;
 
         font = al_load_ttf_font("Arial.ttf",
@@ -70,9 +76,7 @@ int main(void)
                                 0);     // flags
         if (!font)
             die("couldn't load font\n");
-        font_line_height = al_get_font_line_height(font);
 
-        display = al_create_display(CANVAS_WIDTH, CANVAS_HEIGHT);
         event_queue = al_create_event_queue();
         // TODO free this timer?
         timer = al_create_timer(1/60.0);
@@ -85,8 +89,7 @@ int main(void)
         al_register_event_source(event_queue, al_get_mouse_event_source());
 
         audio_stream = portaudio_init(record_callback, &audio_level);
-
-        init_game(objects, &lives, &score);
+        //audio_stream = NULL;
     }
 
     // game loop
@@ -94,11 +97,13 @@ int main(void)
         ALLEGRO_EVENT ev;
         al_wait_for_event(event_queue, &ev);
 
-        if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+        if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            puts("break?");
             break;
-        else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+        } else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+            puts("mouse event");
             if (scene == TITLE)
-                scene = GAME;
+                scene = INTRO;
             else if (scene == GAMEOVER) {
                 ALLEGRO_MOUSE_STATE m_state;
                 al_get_mouse_state(&m_state);
@@ -107,27 +112,34 @@ int main(void)
                 if (x < CANVAS_WIDTH/2.0) { // play again, reset
                     init_game(objects, &lives, &score);
                     scene = GAME;
-                } else
+                } else // quit
                     break;
             }
-        } else if (ev.type == ALLEGRO_EVENT_TIMER) {
+        } else if (ev.type == ALLEGRO_EVENT_TIMER) {    // time for next frame to be drawn
             al_clear_to_color(al_map_rgb(135, 206, 235));
 
             if (scene == TITLE)
                 show_titlescreen(font, &objects[3]);
-            else if (scene == GAMEOVER)
+            else if (scene == INTRO) {
+                int finished = show_intro(objects, &tree_x, display);
+                if (finished == 1) {
+                    init_game(objects, &lives, &score);
+                    scene = GAME;
+                }
+            } else if (scene == GAMEOVER)
                 show_gameover(score, font);
             else if (scene == GAME) {   // main game
+                printf("%f %f\n", objects[NEWTON].x_pos, objects[NEWTON].y_pos);
                 int gameover = game_tick(objects, audio_level, &lives, &score);
                 if (gameover == 1)
                     scene = GAMEOVER;
                 draw_game(objects, display, font, score, lives);
             }
-            
+
             al_flip_display();
         }
     }
-    
+
     free_resources(display, objects, event_queue, audio_stream);
 
     return 0;

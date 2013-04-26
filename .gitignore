@@ -1,1 +1,6 @@
 newtonsapple
+.objs/
+bin/
+obj/
+Thumbs.db
+.DS_Store

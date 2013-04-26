@@ -6,6 +6,7 @@
 #include <allegro5/allegro_image.h>
 #include <portaudio.h>
 #include <stdlib.h> // for exit() in die()
+#include <stdio.h>
 
 void check_pa_err(char *where, PaError err);
 PaStream * portaudio_init(PaStreamCallback *callback, float *data);
