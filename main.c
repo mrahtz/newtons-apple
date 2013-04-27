@@ -128,8 +128,12 @@ int main(void)
                 show_titlescreen(font, &objects[3]);
             else if (scene == INTRO) {
                 int finished = show_intro(objects, &tree_x, display);
-                if (finished == 1)
+                if (finished == 1) {
+                    object *a = &objects[APPLE];
+                    // apple stays still for instructions
+                    a->x_vel = a->y_vel = a->y_acc = a->x_acc = 0;
                     scene = INSTRUCTIONS;
+                }
             } else if (scene == INSTRUCTIONS) {
                 int finished = show_instructions(objects, instructions1, instructions2);
                 if (finished == 1) {

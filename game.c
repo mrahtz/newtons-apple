@@ -62,6 +62,7 @@ void reset_object_position(object *objects, int object_n)
     }
 }
 
+// resets physics for main game scene
 void reset_object_physics(object *objects, int object_n)
 {
     reset_object_position(objects, object_n);
@@ -249,7 +250,8 @@ void draw_objects(const object *objects, int animate_time)
     static int sprite_n = 0;
     enum object_ctr i;
 
-    if (animate_timer % animate_time == 0)
+    if (animate_time != 0 &&   // 0 -> don't animate
+            animate_timer % animate_time == 0)
         sprite_n = !sprite_n;
 
     for (i = 0; i < LAST_OBJECT; i++) {

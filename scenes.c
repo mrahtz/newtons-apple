@@ -94,6 +94,8 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
         update_physics(objects, APPLE);
         // now do another update considering the scene movement
         objects[APPLE].x_pos -= camera_vel;
+        if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)    // gone a little too far...
+            objects[APPLE].x_pos = INIT_APPLE_X;
     }
 
     if (t == GUST_T)
@@ -118,9 +120,10 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
 
     t++;
     camera_vel *= 1.01;
+    //printf("camera: %f, apple: %f, delta: %f, target: %d\n", camera_pos, objects[APPLE].x_pos, objects[APPLE].x_pos - camera_pos, INIT_APPLE_X);
 
     if (apple_was_offscreen && 
-            objects[APPLE].x_pos == INIT_APPLE_X)   // apple now in the right place for the game
+            objects[APPLE].x_pos == INIT_APPLE_X)
         return 1;
     else
         return 0;
@@ -129,19 +132,30 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
 int show_instructions(object *objects, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2)
 {
     static int t = 0;
-    ALLEGRO_BITMAP *bm;
+    ALLEGRO_BITMAP *bm = instructions1; // by default
 
-    draw_objects(objects, 0);
+    const int PAUSE_TIME = 1;
+    const int TIME1 = PAUSE_TIME + 1;
+    const int TIME2 = TIME1 + 2;
 
-    if (t < 60)
+    printf("apple %f %f\n", objects[APPLE].x_vel, objects[APPLE].y_vel);
+
+    if (t >= PAUSE_TIME*60 && t < TIME1*60) {
         bm = instructions1;
-    else
+        objects[APPLE].y_acc = 0.02;
+    } else if (t >= TIME2*60) {
         bm = instructions2;
-    al_draw_bitmap(bm, CANVAS_WIDTH * 3/4.0, CANVAS_HEIGHT/4.0, 0);
+        objects[APPLE].y_acc = -0.04;
+    }
+    update_physics(objects, APPLE);
+    draw_objects(objects, 0);
+    if (t >= PAUSE_TIME*60)
+        al_draw_bitmap(bm, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
+    al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
 
     t++;
 
-    if (t > 120)
+    if (t > TIME2*60)
         return 1;
     else
         return 0;
