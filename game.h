@@ -7,6 +7,7 @@
 
 void init_sprite(object *o, int object_n);
 void reset_object_physics(object *o, int object_n);
+void reset_object_position(object *objects, int object_n);
 int check_if_offscreen(const object *o);
 int check_collision(const object *o1, const object *o2);
 int simulate_objects(object *objects, float audio_level);

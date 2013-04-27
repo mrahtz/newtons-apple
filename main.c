@@ -40,6 +40,7 @@ int main(void)
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *font;
     PaStream *audio_stream;
+    ALLEGRO_BITMAP *instructions1, *instructions2;
     object objects[OBJECTS_END];
     float audio_level = 0;
     int scene = INTRO;
@@ -71,6 +72,9 @@ int main(void)
         objects[GROUND].y_pos = CANVAS_HEIGHT-1 -
                                 al_get_bitmap_height(objects[GROUND].sprite1) + 1;
 
+        instructions1 = al_load_bitmap("instructions1.png");
+        instructions2 = al_load_bitmap("instructions2.png");
+
         font = al_load_ttf_font("Arial.ttf",
                                 36,     // size
                                 0);     // flags
@@ -90,6 +94,8 @@ int main(void)
 
         audio_stream = portaudio_init(record_callback, &audio_level);
         //audio_stream = NULL;
+
+        init_game(objects, &lives, &score);
     }
 
     // game loop
@@ -122,6 +128,10 @@ int main(void)
                 show_titlescreen(font, &objects[3]);
             else if (scene == INTRO) {
                 int finished = show_intro(objects, &tree_x, display);
+                if (finished == 1)
+                    scene = INSTRUCTIONS;
+            } else if (scene == INSTRUCTIONS) {
+                int finished = show_instructions(objects, instructions1, instructions2);
                 if (finished == 1) {
                     init_game(objects, &lives, &score);
                     scene = GAME;

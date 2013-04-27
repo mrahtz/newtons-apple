@@ -11,7 +11,7 @@
 	<stdlib.h>
 	<stdio.h>
 
-1366721691 m:\newtonsapple\globals.h
+1367068865 m:\newtonsapple\globals.h
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
 
@@ -224,7 +224,7 @@
 
 1366209522 m:\c\include\portaudio\portaudio.h
 
-1366721573 source:m:\newtonsapple\main.c
+1367067014 source:m:\newtonsapple\main.c
 	<stdio.h>
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
@@ -246,7 +246,7 @@
 	"allegro5/allegro.h"
 	"allegro5/allegro_font.h"
 
-1366719022 m:\newtonsapple\scenes.h
+1366964588 m:\newtonsapple\scenes.h
 	<allegro5/allegro.h>
 	<allegro5/allegro_font.h>
 	<allegro5/allegro_image.h>
@@ -255,15 +255,15 @@
 	"helpers.h"
 	"game.h"
 
-1366707574 m:\newtonsapple\game.h
+1367068680 m:\newtonsapple\game.h
 	"globals.h"
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
 
-1366721434 source:m:\newtonsapple\scenes.c
+1367068824 source:m:\newtonsapple\scenes.c
 	"scenes.h"
 
-1366718622 source:m:\newtonsapple\game.c
+1366964654 source:m:\newtonsapple\game.c
 	"globals.h"
 	"game.h"
 	"helpers.h"

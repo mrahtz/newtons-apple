@@ -12,6 +12,7 @@
 void show_titlescreen(ALLEGRO_FONT *font, object *newton);
 void init_game(object *objects, int *lives, int *score);
 int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display);
+int show_instructions(object *objects, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2);
 void draw_game(const object *objects,
                ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
                const int score, const int lives);

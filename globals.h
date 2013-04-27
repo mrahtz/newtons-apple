@@ -9,6 +9,7 @@ enum game_scenes
 {
     TITLE,
     INTRO,
+    INSTRUCTIONS,
     GAME,
     GAMEOVER
 };
@@ -24,7 +25,9 @@ enum
     APPLE_RESPAWN_INTERVAL = 30,
     PROJECTILE_RESPAWN_INTERVAL = 120,
     BIRD_RESPAWN_INTERVAL = 110,
-    APPLE_INIT_VEL = 5
+    APPLE_INIT_VEL = 5,
+    INIT_APPLE_X = CANVAS_WIDTH/2,      // so that the intro sequence can check
+    INIT_APPLE_Y = CANVAS_HEIGHT/4
 };
 
 enum object_ctr

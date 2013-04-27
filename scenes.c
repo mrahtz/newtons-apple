@@ -43,16 +43,17 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
     animate_timer++;
 }
 
+extern const float G;   // was defined in game.c
 int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
 {
     static int t = 0;
-    static int camera_vel = 0;
+    static float camera_vel = 0;
     static int sprite_n = 2;
+    static int apple_was_offscreen = 0;
 
     const int DROP_T = 60;
     const int GUST_T = DROP_T + 45;
     const int CAMERA_MOVE_T = GUST_T + 100;
-    const int FINISH_T = CAMERA_MOVE_T + 80;
 
     ALLEGRO_BITMAP *newton_sprite;
     ALLEGRO_BITMAP *tree = al_load_bitmap("tree.png");
@@ -77,11 +78,23 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
         objects[APPLE].y_acc = -0.2;
         objects[APPLE].x_acc = 0.3;
     } else if (t == CAMERA_MOVE_T) {
-        camera_vel = APPLE_INIT_VEL * (int) round(pow(1.01, t-120));
+        camera_vel = (float) APPLE_INIT_VEL;
     }
 
-    if (t >= DROP_T && t <= CAMERA_MOVE_T)
+    if (check_if_offscreen((const object *) &objects[APPLE]) == 1) {
+        reset_object_position(objects, APPLE);
+        objects[APPLE].y_vel = 0;
+        objects[APPLE].x_acc = 0;
+        objects[APPLE].y_acc = -G;
+        apple_was_offscreen = 1;
+    }
+
+    if (t >= DROP_T) {
+        // so this updates the absolute position of the apple
         update_physics(objects, APPLE);
+        // now do another update considering the scene movement
+        objects[APPLE].x_pos -= camera_vel;
+    }
 
     if (t == GUST_T)
         sprite_n = 0;   // awake!
@@ -89,37 +102,49 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
         sprite_n = !sprite_n;   // running!
 
     if (sprite_n == 0)
-        newton_sprite = objects[NEWTON].sprite1;
+        newton_sprite = objects[NEWTON].sprite1; // running 1
     else if (sprite_n == 1)
-        newton_sprite = objects[NEWTON].sprite2;
+        newton_sprite = objects[NEWTON].sprite2; // running 2
     else //if (sprite_n == 2)
-        newton_sprite = objects[NEWTON].sprite3;
+        newton_sprite = objects[NEWTON].sprite3; // asleep
 
     al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
     al_draw_bitmap(tree, *tree_x, tree_y, 0);
     al_draw_bitmap(objects[APPLE].sprite1, objects[APPLE].x_pos, objects[APPLE].y_pos, 0);
     al_draw_bitmap(newton_sprite, objects[NEWTON].x_pos, objects[NEWTON].y_pos, 0);
 
-    rotate_ground(objects[GROUND].sprite1, display, camera_vel);
+    rotate_ground(objects[GROUND].sprite1, display, (int) round(camera_vel));
     *tree_x = *tree_x - camera_vel;
 
     t++;
+    camera_vel *= 1.01;
 
-    if (t >= FINISH_T)
+    if (apple_was_offscreen && 
+            objects[APPLE].x_pos == INIT_APPLE_X)   // apple now in the right place for the game
         return 1;
     else
         return 0;
 }
 
-int show_instructions()
+int show_instructions(object *objects, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2)
 {
     static int t = 0;
+    ALLEGRO_BITMAP *bm;
 
-    if (t == 0)
-        bitmap = 
+    draw_objects(objects, 0);
 
-    draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // animate faster as apple goes faster
-    al_draw_bitmap(bitmap, )
+    if (t < 60)
+        bm = instructions1;
+    else
+        bm = instructions2;
+    al_draw_bitmap(bm, CANVAS_WIDTH * 3/4.0, CANVAS_HEIGHT/4.0, 0);
+
+    t++;
+
+    if (t > 120)
+        return 1;
+    else
+        return 0;
 }
 
 void init_game(object *objects, int *lives, int *score)
@@ -164,7 +189,7 @@ void draw_game(const object *objects,
 
     rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
     al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
-    draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // animate faster as apple goes faster
+    draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
 
     sprintf(score_str, "Score: %d", score);
     al_draw_text(font, al_map_rgb(255,255,255),
