@@ -82,7 +82,7 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
     }
 
     if (check_if_offscreen((const object *) &objects[APPLE]) == 1) {
-        reset_object_position(objects, APPLE);
+        objects[APPLE].y_pos = INIT_APPLE_Y;       // in the right place when the game starts
         objects[APPLE].y_vel = 0;
         objects[APPLE].x_acc = 0;
         objects[APPLE].y_acc = -G;
