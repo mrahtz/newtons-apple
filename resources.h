@@ -8,7 +8,7 @@
 #include "utilities.h"
 #include "game.h" // for init_sprite
 
-void load_resources(ALLEGRO_FONT *font, intro_resource_struct *intro_resources, object *objects);
+void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources, object *objects);
 void free_resources(ALLEGRO_FONT *font, intro_resource_struct *intro_resources, object *objects);
 
 #endif

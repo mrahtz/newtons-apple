@@ -74,9 +74,8 @@ int main(void)
         srand(time(NULL));
         display = init_allegro(&event_queue, &timer);
         audio_stream = init_portaudio(&audio_level);
-        load_resources(font, &intro_resources, objects);
-        game_state.scene = INTRO;
-        //init_game(objects, &game_state);
+        load_resources(&font, &intro_resources, objects);
+        game_state.scene = TITLE;
     }
 
     // game loop

@@ -16,9 +16,9 @@ static void load_respawn(object *o, int n)
     }
 }
 
-void load_resources(ALLEGRO_FONT *font, intro_resource_struct *intro_resources, object *objects)
+void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources, object *objects)
 {
-    font = al_load_ttf_font("Arial.ttf",
+    *font = al_load_ttf_font("Arial.ttf",
                             36,     // size
                             0);     // flags
     if (!font)
