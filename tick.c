@@ -29,7 +29,7 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
         break;
 
     case INTRO:
-        finished = show_intro(objects, display, intro_resources->tree);
+        finished = show_intro(objects, display, intro_resources->tree, intro_resources->font);
         if (finished == 1)
             game_state->scene = INSTRUCTIONS;
         break;

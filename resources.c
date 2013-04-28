@@ -23,6 +23,9 @@ void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources,
                             0);     // flags
     if (!(*font))
         die("couldn't load font\n");
+    intro_resources->font = al_load_ttf_font("Arial.ttf",
+                                             20,
+                                             0);
 
     intro_resources->instructions1 = al_load_bitmap("instructions1.png");
     intro_resources->instructions2 = al_load_bitmap("instructions2.png");

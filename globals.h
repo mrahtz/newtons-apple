@@ -3,6 +3,7 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_font.h>
 
 // TODO justify use of enums rather than defines
 enum game_states
@@ -71,6 +72,7 @@ typedef struct
     ALLEGRO_BITMAP *tree;
     ALLEGRO_BITMAP *instructions1;
     ALLEGRO_BITMAP *instructions2;
+    ALLEGRO_FONT *font; // small font for showing labels on Newton
 } intro_resource_struct;
 
 typedef struct
