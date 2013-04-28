@@ -167,6 +167,9 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
 
     update_physics(objects, APPLE, MODE_WRT_APPLE);
     rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
+    // draw newton and the apple
+    objects[APPLE].destroyed = 0;
+    objects[NEWTON].destroyed = 0;
     draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
     if (t > PAUSE_T)
         al_draw_bitmap(bm, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
@@ -180,6 +183,19 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
         return 0;
 }
 
+void reset_objects(object *objects)
+{
+    enum object_ctr i;
+    for (i = 0; i < LAST_MOVER; i++) {
+        objects[i].destroyed = 1;
+        objects[i].timer = 0;
+        reset_object_physics(objects, i);
+    }
+    // initially just newton and the apple on screen
+    objects[APPLE].destroyed = 0;
+    objects[NEWTON].destroyed = 0;
+}
+
 void init_game(game_state_struct *game_state, object *objects)
 {
     game_state->score = 0;
@@ -187,16 +203,11 @@ void init_game(game_state_struct *game_state, object *objects)
     enum object_ctr i;
     for (i = 0; i < LAST_MOVER; i++) {
         // give the player some time to get used to things
-        if (i != APPLE && i != NEWTON) {
+        if (i == BIRD || i == PROJECTILE) {
             objects[i].destroyed = 1;
             objects[i].timer = (int) INIT_SPAWN_INTERVAL * rand_between(1.0, 3.0);
         }
     }
-    objects[APPLE].destroyed = 0;
-    objects[APPLE].timer = 0;
-    objects[NEWTON].destroyed = 0;
-    //reset_object_physics(objects, APPLE);
-    reset_object_physics(objects, NEWTON);
 }
 
 int game_tick(object *objects, const float audio_level, int *lives, int *score)

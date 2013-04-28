@@ -10,7 +10,7 @@ void handle_click(int *scene)
         int x = m_state.x;
 
         if (x < CANVAS_WIDTH/2.0) // play again, reset
-            *scene = INIT_GAME;
+            *scene = INIT_GAME_WITH_RESET;
         else
             *scene = QUIT;
     }
@@ -27,11 +27,13 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
     case TITLE:
         show_titlescreen(font, &objects[NEWTON]);
         break;
+
     case INTRO:
         finished = show_intro(objects, display, intro_resources->tree);
         if (finished == 1)
             game_state->scene = INSTRUCTIONS;
         break;
+
     case INSTRUCTIONS:
         finished = show_instructions(objects, display,
             intro_resources->instructions1, intro_resources->instructions2);
@@ -41,16 +43,20 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
             game_state->scene = INIT_GAME;
         }
         break;
+
+    // note fallthrough!
+    case INIT_GAME_WITH_RESET:
+        reset_objects(objects);
     case INIT_GAME:
         init_game(game_state, objects);
         game_state->scene = GAME;
-        break;
     case GAME:
         gameover = game_tick(objects, audio_level, &(game_state->lives), &(game_state->score));
         draw_game(objects, display, font, game_state->lives, game_state->score);
         if (gameover == 1)
             game_state->scene = GAMEOVER;
         break;
+
     case GAMEOVER:
         show_gameover(game_state->score, font);
         break;

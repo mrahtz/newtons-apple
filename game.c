@@ -60,7 +60,6 @@ void reset_object_position(object *objects, int object_n)
     }
 }
 
-// resets physics for main game scene
 void reset_object_physics(object *objects, int object_n)
 {
     reset_object_position(objects, object_n);

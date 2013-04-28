@@ -10,6 +10,7 @@ enum game_states
     TITLE,
     INTRO,
     INSTRUCTIONS,
+    INIT_GAME_WITH_RESET,
     INIT_GAME,
     GAME,
     GAMEOVER,

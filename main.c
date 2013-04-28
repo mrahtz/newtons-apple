@@ -51,6 +51,7 @@ void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *event_queue, AL
     al_destroy_event_queue(event_queue); 
     al_destroy_display(display);
 }
+
 int main(void)
 {
     // stuff for init_allegro
@@ -75,6 +76,7 @@ int main(void)
         display = init_allegro(&event_queue, &timer);
         audio_stream = init_portaudio(&audio_level);
         load_resources(&font, &intro_resources, objects);
+        reset_objects(objects);
         game_state.scene = TITLE;
     }
 
