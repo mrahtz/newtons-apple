@@ -50,9 +50,9 @@ void free_resources(ALLEGRO_FONT *font, intro_resource_struct *intro_resources, 
         al_destroy_bitmap(o.sprite3);
     }
 
-    al_destroy_bitmap(intro_resources->tree):
-    al_destroy_bitmap(intro_resources->instructions2):
-    al_destroy_bitmap(intro_resources->instructions1):
+    al_destroy_bitmap(intro_resources->tree);
+    al_destroy_bitmap(intro_resources->instructions2);
+    al_destroy_bitmap(intro_resources->instructions1);
 
     al_destroy_font(font);
 }

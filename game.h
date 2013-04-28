@@ -1,9 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "globals.h"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include "utilities.h"
+#include "globals.h"
 
 void init_sprite(object *o, int object_n);
 void reset_object_physics(object *o, int object_n);

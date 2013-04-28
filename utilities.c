@@ -1,3 +1,5 @@
+#include "utilities.h"
+
 float rand_between(float min, float max)
 {
     int range = max-min;

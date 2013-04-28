@@ -11,8 +11,10 @@
 #include "globals.h"
 #include "scenes.h"
 #include "game.h"
-#include "helpers.h"
+#include "utilities.h"
 #include "resources.h"
+#include "audio.h"
+#include "tick.h"
 
 ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER **timer)
 {
@@ -36,14 +38,14 @@ ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER 
         die("couldn't create timer\n");
     al_start_timer(*timer);
 
-    al_register_event_source(event_queue, al_get_display_event_source(display));
-    al_register_event_source(event_queue, al_get_timer_event_source(*timer));
-    al_register_event_source(event_queue, al_get_mouse_event_source());
+    al_register_event_source(*event_queue, al_get_display_event_source(display));
+    al_register_event_source(*event_queue, al_get_timer_event_source(*timer));
+    al_register_event_source(*event_queue, al_get_mouse_event_source());
 
     return display;
 }
 
-void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER **timer)
+void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *event_queue, ALLEGRO_TIMER *timer)
 {
     al_destroy_timer(timer);
     al_destroy_event_queue(event_queue); 
@@ -61,7 +63,7 @@ int main(void)
     float audio_level = 0;
 
     // stuff for load_resources
-    ALLEGRO_FONT *font;
+    ALLEGRO_FONT *font = NULL; // so clang is ok it being passed to load_resources
     intro_resource_struct intro_resources;
     object objects[OBJECTS_END];
 
@@ -71,9 +73,9 @@ int main(void)
     {
         srand(time(NULL));
         display = init_allegro(&event_queue, &timer);
-        audio_stream = init_audio(&audio_level);
-        load_resources(font, intro_resources, objects);
-        game_state->scene = INTRO;
+        audio_stream = init_portaudio(&audio_level);
+        load_resources(font, &intro_resources, objects);
+        game_state.scene = INTRO;
         //init_game(objects, &game_state);
     }
 
@@ -83,14 +85,14 @@ int main(void)
         al_wait_for_event(event_queue, &ev);
 
         if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
-            handle_click(&scene);
+            handle_click(&(game_state.scene));
         else if (ev.type == ALLEGRO_EVENT_TIMER)    // time for next frame to be drawn
-            tick(game_state, audio_level, objects, display, font, intro_resources);
-        else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || scene == QUIT)
+            tick(&game_state, audio_level, objects, display, font, &intro_resources);
+        else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || game_state.scene == QUIT)
             break;
     }
 
-    free_resources(font, intro_resources, object);
+    free_resources(font, &intro_resources, objects);
     free_portaudio(audio_stream);
     free_allegro(display, event_queue, timer);
 

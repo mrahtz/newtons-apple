@@ -5,11 +5,12 @@
 #include <allegro5/allegro_image.h>
 
 // TODO justify use of enums rather than defines
-enum game_scenes
+enum game_states
 {
     TITLE,
     INTRO,
     INSTRUCTIONS,
+    INIT_GAME,
     GAME,
     GAMEOVER,
     QUIT

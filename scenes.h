@@ -6,11 +6,10 @@
 #include <allegro5/allegro_image.h>
 #include <math.h>	// for pow() in show_intro
 #include "globals.h"
-#include "helpers.h"
 #include "game.h"
 
 void show_titlescreen(ALLEGRO_FONT *font, object *newton);
-void init_game(object *objects, int *lives, int *score);
+void init_game(game_state_struct *game_state, object *objects);
 int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree);
 int show_instructions(object *objects, ALLEGRO_DISPLAY *display,
 	ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2);

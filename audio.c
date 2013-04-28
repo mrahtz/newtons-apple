@@ -1,3 +1,5 @@
+#include "audio.h"
+
 void check_pa_err(char *where, PaError err)
 {
     if (err != paNoError) {
@@ -11,7 +13,7 @@ int record_callback(const void *inputBuffer, void *outputBuffer,
                     unsigned long framesPerBuffer,
                     const PaStreamCallbackTimeInfo* timeInfo,
                     PaStreamCallbackFlags statusFlags,
-                    void *userdata)
+                    void *userData)
 {
     int i;
     float *in = (float *) inputBuffer;

@@ -1,4 +1,4 @@
-#include "resources.h"
+#include "tick.h"
 
 void handle_click(int *scene)
 {
@@ -16,40 +16,43 @@ void handle_click(int *scene)
     }
 }
 
-void tick(game_state_struct *state, float audio_level, object *objects,
+void tick(game_state_struct *game_state, float audio_level, object *objects,
         ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, intro_resource_struct *intro_resources)
 {
+    int finished, gameover;
+
     al_clear_to_color(al_map_rgb(135, 206, 235));
 
-    switch (state->scene) {
-    TITLE:
+    switch (game_state->scene) {
+    case TITLE:
         show_titlescreen(font, &objects[NEWTON]);
         break;
-    INTRO:
-        int finished = show_intro(objects, display, intro_resources);
+    case INTRO:
+        finished = show_intro(objects, display, intro_resources->tree);
         if (finished == 1)
-            state->scene = INSTRUCTIONS;
+            game_state->scene = INSTRUCTIONS;
         break;
-    INSTRUCTIONS:
-        int finished = show_instructions(objects, display, intro_resources);
+    case INSTRUCTIONS:
+        finished = show_instructions(objects, display,
+            intro_resources->instructions1, intro_resources->instructions2);
         if (finished == 1) {
             // reset to current velocity when apple is destroyed
             objects[APPLE].reset_x_vel = objects[APPLE].x_vel;
-            state->scene = INIT_GAME;
+            game_state->scene = INIT_GAME;
         }
         break;
-    INIT_GAME:
+    case INIT_GAME:
         init_game(game_state, objects);
-        state->scene = GAME;
+        game_state->scene = GAME;
         break;
-    GAME:
-        int gameover = game_tick(game_state, audio_level, objects);
-        draw_game(game_state, objects, display, font);
+    case GAME:
+        gameover = game_tick(objects, audio_level, &(game_state->lives), &(game_state->score));
+        draw_game(objects, display, font, game_state->lives, game_state->score);
         if (gameover == 1)
-            state->scene = GAMEOVER;
+            game_state->scene = GAMEOVER;
         break;
-    GAMEOVER:
-        show_gameover(state->score, font);
+    case GAMEOVER:
+        show_gameover(game_state->score, font);
         break;
     }
 

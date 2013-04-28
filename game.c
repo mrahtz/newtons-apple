@@ -1,6 +1,4 @@
-#include "globals.h"
 #include "game.h"
-#include "helpers.h"
 
 const float G = 0.1;
 
