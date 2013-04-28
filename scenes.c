@@ -126,7 +126,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree)
         return 0;
 }
 
-extern const float G;   // defined in game.c
+extern const float G;   // defined in physics.c
 int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2)
 {
     static int t = 0;
