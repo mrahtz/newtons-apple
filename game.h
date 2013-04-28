@@ -13,6 +13,6 @@ int check_collision(const object *o1, const object *o2);
 int simulate_objects(object *objects, float audio_level);
 void draw_objects(const object *objects, int animate_time);
 void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount);
-void update_physics(object *objects, int n);
+void update_physics(object *objects, int n, int mode);
 
 #endif

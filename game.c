@@ -51,7 +51,7 @@ void reset_object_position(object *objects, int object_n)
             o->y_pos = objects[NEWTON].y_pos - newton_height - 5;
             break;
         case BIRD:
-            o->x_pos = CANVAS_WIDTH-1;
+            o->x_pos = -al_get_bitmap_width(objects[NEWTON].sprite1);
             o->y_pos = rand_between(0, CANVAS_HEIGHT/2);
             break;
         case NEWTON:
@@ -72,7 +72,7 @@ void reset_object_physics(object *objects, int object_n)
 
     switch (object_n) {
         case APPLE:
-            o->x_vel = APPLE_INIT_VEL;
+            o->x_vel = o->reset_x_vel;
             o->x_acc = 0.01;
             break;
 
@@ -86,7 +86,7 @@ void reset_object_physics(object *objects, int object_n)
             break;
 
         case BIRD:
-            o->x_vel = -1;
+            o->x_vel = 1;
             break;
 
         case NEWTON:
@@ -142,14 +142,21 @@ int check_ground_collision(object *o, object *ground)
     return collided;
 }
 
-void update_physics(object *objects, int n)
+void update_physics(object *objects, int n, int mode)
 {
     object *o = &objects[n];
 
     o->x_vel += o->x_acc;
     o->y_vel += o->y_acc;
 
-    o->x_pos += o->x_vel;
+    if (mode == ABSOLUTE) {
+        o->x_pos += o->x_vel;
+    } else if (mode == WRT_APPLE) {
+        if (n == BIRD)
+            o->x_pos += o->x_vel + objects[APPLE].x_vel / 5.0;
+        if (n != APPLE)
+            o->x_pos += o->x_vel;
+    }
     o->y_pos += o->y_vel;
 }
 
@@ -175,14 +182,7 @@ int simulate_objects(object *objects, const float audio_level)
         if (i == APPLE)
             o->y_acc = G - 5*audio_level;
 
-        o->x_vel += o->x_acc;
-        o->y_vel += o->y_acc;
-        // display is fixed wrt apple
-        if (i == BIRD)
-            o->x_pos += (o->x_vel - objects[APPLE].x_vel);
-        else if (i != APPLE)
-            o->x_pos += o->x_vel;
-        o->y_pos += o->y_vel;
+        update_physics(objects, i, WRT_APPLE);
         //printf("%f %f\n", o->x_pos, o->y_pos);
 
         if (i != APPLE && 

@@ -44,31 +44,29 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
 }
 
 extern const float G;   // was defined in game.c
-int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
+int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree)
 {
     static int t = 0;
     static float camera_vel = 0;
     static int sprite_n = 2;
     static int apple_was_offscreen = 0;
+    static int tree_x = -30;
+    int tree_height = al_get_bitmap_height(tree);
+    int tree_y = objects[GROUND].y_pos - tree_height;
 
-    const int DROP_T = 60;
+    const int DROP_T = 120;
     const int GUST_T = DROP_T + 45;
     const int CAMERA_MOVE_T = GUST_T + 100;
+    const int APPLE_OFFSET_X = 100;
+    const float CAMERA_SLOWDOWN_K = 0.13; // derived experimentally :(
 
     ALLEGRO_BITMAP *newton_sprite;
-    ALLEGRO_BITMAP *tree = al_load_bitmap("tree.png");
-
-    int tree_height = al_get_bitmap_height(tree);
-    //int tree_width = al_get_bitmap_width(tree);
-    //int tree_x = objects[GROUND].x_pos;
-    int tree_y = objects[GROUND].y_pos - tree_height;
 
     if (t == 0) {
         reset_object_physics(objects, APPLE);
         reset_object_physics(objects, NEWTON);
-        objects[APPLE].x_pos = objects[NEWTON].x_pos;
+        objects[APPLE].x_pos = APPLE_OFFSET_X;
         sprite_n = 2;  // asleep
-        // TODO y pos?
     } if (t == DROP_T) {
         objects[APPLE].x_acc = 0;
         objects[APPLE].y_acc = 0.1;
@@ -78,20 +76,29 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
         objects[APPLE].y_acc = -0.2;
         objects[APPLE].x_acc = 0.3;
     } else if (t == CAMERA_MOVE_T) {
-        camera_vel = (float) APPLE_INIT_VEL;
+        camera_vel = (float) APPLE_INIT_VEL; // for want of a better value
     }
 
-    if (check_if_offscreen((const object *) &objects[APPLE]) == 1) {
+    int apple_is_offscreen = (check_if_offscreen((const object *) &objects[APPLE]) == 1);
+    if (apple_is_offscreen) {
         objects[APPLE].y_pos = INIT_APPLE_Y;       // in the right place when the game starts
         objects[APPLE].y_vel = 0;
         objects[APPLE].x_acc = 0;
-        objects[APPLE].y_acc = -G;
+        objects[APPLE].y_acc = 0;
+        // x_vel stays the same after the gust
         apple_was_offscreen = 1;
     }
 
+    // if before newton catching up to apple, acclerate
+    int apple_is_onscreen = !apple_is_offscreen;
+    if ( ! (apple_was_offscreen && apple_is_onscreen))
+        camera_vel *= 1.015;
+    else // sync with apple speed
+        camera_vel -= CAMERA_SLOWDOWN_K*(camera_vel - objects[APPLE].x_vel);
+
     if (t >= DROP_T) {
         // so this updates the absolute position of the apple
-        update_physics(objects, APPLE);
+        update_physics(objects, APPLE, ABSOLUTE);
         // now do another update considering the scene movement
         objects[APPLE].x_pos -= camera_vel;
         if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)    // gone a little too far...
@@ -111,16 +118,14 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
         newton_sprite = objects[NEWTON].sprite3; // asleep
 
     al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
-    al_draw_bitmap(tree, *tree_x, tree_y, 0);
+    al_draw_bitmap(tree, tree_x, tree_y, 0);
     al_draw_bitmap(objects[APPLE].sprite1, objects[APPLE].x_pos, objects[APPLE].y_pos, 0);
     al_draw_bitmap(newton_sprite, objects[NEWTON].x_pos, objects[NEWTON].y_pos, 0);
 
     rotate_ground(objects[GROUND].sprite1, display, (int) round(camera_vel));
-    *tree_x = *tree_x - camera_vel;
+    tree_x = tree_x - camera_vel;
 
     t++;
-    camera_vel *= 1.01;
-    //printf("camera: %f, apple: %f, delta: %f, target: %d\n", camera_pos, objects[APPLE].x_pos, objects[APPLE].x_pos - camera_pos, INIT_APPLE_X);
 
     if (apple_was_offscreen && 
             objects[APPLE].x_pos == INIT_APPLE_X)
@@ -129,33 +134,47 @@ int show_intro(object *objects, int *tree_x, ALLEGRO_DISPLAY *display)
         return 0;
 }
 
-int show_instructions(object *objects, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2)
+extern const float G;   // defined in game.c
+int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2)
 {
     static int t = 0;
+    static int loop = 0;
     ALLEGRO_BITMAP *bm = instructions1; // by default
 
-    const int PAUSE_TIME = 1;
-    const int TIME1 = PAUSE_TIME + 1;
-    const int TIME2 = TIME1 + 2;
 
-    printf("apple %f %f\n", objects[APPLE].x_vel, objects[APPLE].y_vel);
+    const int PAUSE_T = 60;
+    // pause
+    // fall
+    // if too low, blow
+    // if too high, stop
+    // if too low, blow
+    // if too high, stop
 
-    if (t >= PAUSE_TIME*60 && t < TIME1*60) {
-        bm = instructions1;
-        objects[APPLE].y_acc = 0.02;
-    } else if (t >= TIME2*60) {
+    if (t == PAUSE_T)
+        objects[APPLE].y_acc = G;
+
+    if (t >= PAUSE_T &&
+            objects[APPLE].y_pos > CANVAS_HEIGHT * 0.4) {   // too low!
+        objects[APPLE].y_acc = -G;    // bloooow!
         bm = instructions2;
-        objects[APPLE].y_acc = -0.04;
+    } else if (t >= PAUSE_T &&
+            objects[APPLE].y_pos < CANVAS_HEIGHT * 0.4) {  // high enough, stop blowing
+        if (objects[APPLE].y_acc != G) // we've just switched
+            loop++;
+        objects[APPLE].y_acc = G;
+        bm = instructions1;
     }
-    update_physics(objects, APPLE);
-    draw_objects(objects, 0);
-    if (t >= PAUSE_TIME*60)
+
+    update_physics(objects, APPLE, WRT_APPLE);
+    rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
+    draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
+    if (t > PAUSE_T)
         al_draw_bitmap(bm, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
     al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
 
     t++;
 
-    if (t > TIME2*60)
+    if (loop == 3)
         return 1;
     else
         return 0;
@@ -176,7 +195,7 @@ void init_game(object *objects, int *lives, int *score)
     objects[APPLE].destroyed = 0;
     objects[APPLE].timer = 0;
     objects[NEWTON].destroyed = 0;
-    reset_object_physics(objects, APPLE);
+    //reset_object_physics(objects, APPLE);
     reset_object_physics(objects, NEWTON);
 }
 

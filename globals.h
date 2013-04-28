@@ -30,6 +30,12 @@ enum
     INIT_APPLE_Y = CANVAS_HEIGHT/4
 };
 
+enum physics_modes
+{
+    ABSOLUTE,
+    WRT_APPLE
+};
+
 enum object_ctr
 {
     APPLE,
@@ -50,6 +56,7 @@ typedef struct
     ALLEGRO_BITMAP *sprite3;    // only used for Newton asleep
     float x_acc, y_acc; // acceleration
     float x_vel, y_vel; // velocity
+    float reset_x_vel;    // only used for apple - save vel after instructions finished
     float x_pos, y_pos; // position
     int destroyed;      // whether the object should be drawn
     int timer;          // time since object destroyed (0 = don't count)

@@ -40,13 +40,13 @@ int main(void)
     ALLEGRO_TIMER *timer;
     ALLEGRO_FONT *font;
     PaStream *audio_stream;
+    ALLEGRO_BITMAP *tree;
     ALLEGRO_BITMAP *instructions1, *instructions2;
     object objects[OBJECTS_END];
     float audio_level = 0;
     int scene = INTRO;
     int score;
     int lives;
-    int tree_x = 0;
 
     // initialisation
     {
@@ -74,6 +74,7 @@ int main(void)
 
         instructions1 = al_load_bitmap("instructions1.png");
         instructions2 = al_load_bitmap("instructions2.png");
+        tree = al_load_bitmap("tree.png");
 
         font = al_load_ttf_font("Arial.ttf",
                                 36,     // size
@@ -127,23 +128,22 @@ int main(void)
             if (scene == TITLE)
                 show_titlescreen(font, &objects[3]);
             else if (scene == INTRO) {
-                int finished = show_intro(objects, &tree_x, display);
+                int finished = show_intro(objects, display, tree);
                 if (finished == 1) {
-                    object *a = &objects[APPLE];
-                    // apple stays still for instructions
-                    a->x_vel = a->y_vel = a->y_acc = a->x_acc = 0;
+                    // keep apple speed after intro to avoid jarring snap
+                    //reset_object_physics(objects, APPLE);
                     scene = INSTRUCTIONS;
                 }
             } else if (scene == INSTRUCTIONS) {
-                int finished = show_instructions(objects, instructions1, instructions2);
+                int finished = show_instructions(objects, display, instructions1, instructions2);
                 if (finished == 1) {
+                    objects[APPLE].reset_x_vel = objects[APPLE].x_vel;
                     init_game(objects, &lives, &score);
                     scene = GAME;
                 }
             } else if (scene == GAMEOVER)
                 show_gameover(score, font);
             else if (scene == GAME) {   // main game
-                printf("%f %f\n", objects[NEWTON].x_pos, objects[NEWTON].y_pos);
                 int gameover = game_tick(objects, audio_level, &lives, &score);
                 if (gameover == 1)
                     scene = GAMEOVER;
