@@ -6,6 +6,10 @@ void init_sprite(object *o, int object_n)
 {
     char sprite1_fn[20], sprite2_fn[20];
 
+    // so can call al_destroy_bitmap on them later,
+    // even if they're unused
+    o->sprite1 = o->sprite2 = o->sprite3 = NULL;
+
     switch (object_n) {
         case APPLE:
             strcpy(sprite1_fn, "apple.png");

@@ -34,6 +34,7 @@ void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources,
         load_respawn(&objects[i], i);
     }
     objects[GROUND].sprite1 = al_load_bitmap("ground.png");
+    objects[GROUND].sprite2 = objects[GROUND].sprite3 = NULL;
     objects[GROUND].x_pos = 0;
     objects[GROUND].y_pos = CANVAS_HEIGHT-1 -
                             al_get_bitmap_height(objects[GROUND].sprite1) + 1;
@@ -42,7 +43,7 @@ void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources,
 void free_resources(ALLEGRO_FONT *font, intro_resource_struct *intro_resources, object *objects)
 {
     enum object_ctr i;
-    for (i = 0; i < OBJECTS_END; i++) {
+    for (i = 0; i < LAST_MOVER; i++) {
         object o = objects[i];
         // some of these may be NULL, but al_destroy_bitmap is ok with that :)
         al_destroy_bitmap(o.sprite1);
