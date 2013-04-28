@@ -165,7 +165,7 @@ int simulate_objects(object *objects, const float audio_level)
 {
     enum object_ctr i;
 
-    for (i = 0; i < LAST_OBJECT; i++) {
+    for (i = 0; i < LAST_MOVER; i++) {
         object *o = &objects[i];
 
         // handle respawn timing
@@ -254,7 +254,7 @@ void draw_objects(const object *objects, int animate_time)
             animate_timer % animate_time == 0)
         sprite_n = !sprite_n;
 
-    for (i = 0; i < LAST_OBJECT; i++) {
+    for (i = 0; i < LAST_MOVER; i++) {
         const object *o = &objects[i];
 
         if (o->destroyed)

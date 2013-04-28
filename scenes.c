@@ -180,12 +180,12 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
         return 0;
 }
 
-void init_game(object *objects, int *lives, int *score)
+void init_game(game_state_struct *game_state, object *objects)
 {
-    *score = 0;
-    *lives = 3;
+    game_state->score = 0;
+    game_state->lives = 3;
     enum object_ctr i;
-    for (i = 0; i < LAST_OBJECT; i++) {
+    for (i = 0; i < LAST_MOVER; i++) {
         // give the player some time to get used to things
         if (i != APPLE && i != NEWTON) {
             objects[i].destroyed = 1;

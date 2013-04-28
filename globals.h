@@ -11,7 +11,8 @@ enum game_scenes
     INTRO,
     INSTRUCTIONS,
     GAME,
-    GAMEOVER
+    GAMEOVER,
+    QUIT
 };
 
 enum
@@ -42,9 +43,9 @@ enum object_ctr
     PROJECTILE,
     BIRD,
     NEWTON,
-    LAST_OBJECT,
-    // after LAST_OBJECT so it's not accessed during the normal
-    // i < LAST_OBJECT iterations
+    LAST_MOVER,
+    // after LAST_MOVER so it's not accessed during the normal
+    // i < LAST_MOVER iterations
     GROUND,
     OBJECTS_END
 };
@@ -62,5 +63,19 @@ typedef struct
     int timer;          // time since object destroyed (0 = don't count)
     int respawn_interval;
 } object;
+
+typedef struct
+{
+    ALLEGRO_BITMAP *tree;
+    ALLEGRO_BITMAP *instructions1;
+    ALLEGRO_BITMAP *instructions2;
+} intro_resource_struct;
+
+typedef struct
+{
+    int scene;
+    int score;
+    int lives; 
+} game_state_struct;
 
 #endif

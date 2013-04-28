@@ -12,91 +12,69 @@
 #include "scenes.h"
 #include "game.h"
 #include "helpers.h"
+#include "resources.h"
 
-// stores average amplitude of buffer in userData pointer
-int record_callback(const void *inputBuffer, void *outputBuffer,
-                    unsigned long framesPerBuffer,
-                    const PaStreamCallbackTimeInfo* timeInfo,
-                    PaStreamCallbackFlags statusFlags,
-                    void *userdata)
+ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER **timer)
 {
-    int i;
-    float *in = (float *) inputBuffer;
-    float *mean = (float *) userdata;
-    float sum = 0;
+    ALLEGRO_DISPLAY *display;
 
-    for (i = 0; i < framesPerBuffer; i++) {
-        sum += fabs(in[0]);
-    }
-    *mean = sum/framesPerBuffer;
+    al_init();
+    al_init_image_addon();
+    al_init_font_addon();
+    al_init_ttf_addon();
+    al_install_mouse();
 
-    return 0;
+    // creating the display before loading the sprites produces a slight pause,
+    // but otherwise bitmaps will be loaded into system RAM (rather than video RAM)
+    // and be really slow
+    display = al_create_display(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    *event_queue = al_create_event_queue();
+    // TODO free this timer?
+    *timer = al_create_timer(1/60.0);
+    if (!(*timer))
+        die("couldn't create timer\n");
+    al_start_timer(*timer);
+
+    al_register_event_source(event_queue, al_get_display_event_source(display));
+    al_register_event_source(event_queue, al_get_timer_event_source(*timer));
+    al_register_event_source(event_queue, al_get_mouse_event_source());
+
+    return display;
 }
 
+void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER **timer)
+{
+    al_destroy_timer(timer);
+    al_destroy_event_queue(event_queue); 
+    al_destroy_display(display);
+}
 int main(void)
 {
-    ALLEGRO_DISPLAY *display = NULL;
-    ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+    // stuff for init_allegro
+    ALLEGRO_EVENT_QUEUE *event_queue;
     ALLEGRO_TIMER *timer;
-    ALLEGRO_FONT *font;
+    ALLEGRO_DISPLAY *display;
+
+    // stuff for init_audio
     PaStream *audio_stream;
-    ALLEGRO_BITMAP *tree;
-    ALLEGRO_BITMAP *instructions1, *instructions2;
-    object objects[OBJECTS_END];
     float audio_level = 0;
-    int scene = INTRO;
-    int score;
-    int lives;
+
+    // stuff for load_resources
+    ALLEGRO_FONT *font;
+    intro_resource_struct intro_resources;
+    object objects[OBJECTS_END];
+
+    game_state_struct game_state;
 
     // initialisation
     {
-        al_init();
-        al_init_image_addon();
-        al_init_font_addon();
-        al_init_ttf_addon();
-        al_install_mouse();
         srand(time(NULL));
-
-        display = al_create_display(CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        // though the window pops up for a second with nothing on it,
-        // they have to be loaded after display creation for them to be
-        // loaded into video memory (rather than system memory)
-        enum object_ctr i;
-        for (i = 0; i < LAST_OBJECT; i++) {
-            init_sprite(&objects[i], i);
-            load_respawn(&objects[i], i);
-        }
-        objects[GROUND].sprite1 = al_load_bitmap("ground.png");
-        objects[GROUND].x_pos = 0;
-        objects[GROUND].y_pos = CANVAS_HEIGHT-1 -
-                                al_get_bitmap_height(objects[GROUND].sprite1) + 1;
-
-        instructions1 = al_load_bitmap("instructions1.png");
-        instructions2 = al_load_bitmap("instructions2.png");
-        tree = al_load_bitmap("tree.png");
-
-        font = al_load_ttf_font("Arial.ttf",
-                                36,     // size
-                                0);     // flags
-        if (!font)
-            die("couldn't load font\n");
-
-        event_queue = al_create_event_queue();
-        // TODO free this timer?
-        timer = al_create_timer(1/60.0);
-        if (!timer)
-            die("couldn't create timer\n");
-        al_start_timer(timer);
-
-        al_register_event_source(event_queue, al_get_display_event_source(display));
-        al_register_event_source(event_queue, al_get_timer_event_source(timer));
-        al_register_event_source(event_queue, al_get_mouse_event_source());
-
-        audio_stream = portaudio_init(record_callback, &audio_level);
-        //audio_stream = NULL;
-
-        init_game(objects, &lives, &score);
+        display = init_allegro(&event_queue, &timer);
+        audio_stream = init_audio(&audio_level);
+        load_resources(font, intro_resources, objects);
+        game_state->scene = INTRO;
+        //init_game(objects, &game_state);
     }
 
     // game loop
@@ -104,57 +82,17 @@ int main(void)
         ALLEGRO_EVENT ev;
         al_wait_for_event(event_queue, &ev);
 
-        if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            puts("break?");
+        if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
+            handle_click(&scene);
+        else if (ev.type == ALLEGRO_EVENT_TIMER)    // time for next frame to be drawn
+            tick(game_state, audio_level, objects, display, font, intro_resources);
+        else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || scene == QUIT)
             break;
-        } else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-            puts("mouse event");
-            if (scene == TITLE)
-                scene = INTRO;
-            else if (scene == GAMEOVER) {
-                ALLEGRO_MOUSE_STATE m_state;
-                al_get_mouse_state(&m_state);
-                int x = m_state.x;
-
-                if (x < CANVAS_WIDTH/2.0) { // play again, reset
-                    init_game(objects, &lives, &score);
-                    scene = GAME;
-                } else // quit
-                    break;
-            }
-        } else if (ev.type == ALLEGRO_EVENT_TIMER) {    // time for next frame to be drawn
-            al_clear_to_color(al_map_rgb(135, 206, 235));
-
-            if (scene == TITLE)
-                show_titlescreen(font, &objects[3]);
-            else if (scene == INTRO) {
-                int finished = show_intro(objects, display, tree);
-                if (finished == 1) {
-                    // keep apple speed after intro to avoid jarring snap
-                    //reset_object_physics(objects, APPLE);
-                    scene = INSTRUCTIONS;
-                }
-            } else if (scene == INSTRUCTIONS) {
-                int finished = show_instructions(objects, display, instructions1, instructions2);
-                if (finished == 1) {
-                    objects[APPLE].reset_x_vel = objects[APPLE].x_vel;
-                    init_game(objects, &lives, &score);
-                    scene = GAME;
-                }
-            } else if (scene == GAMEOVER)
-                show_gameover(score, font);
-            else if (scene == GAME) {   // main game
-                int gameover = game_tick(objects, audio_level, &lives, &score);
-                if (gameover == 1)
-                    scene = GAMEOVER;
-                draw_game(objects, display, font, score, lives);
-            }
-
-            al_flip_display();
-        }
     }
 
-    free_resources(display, objects, event_queue, audio_stream);
+    free_resources(font, intro_resources, object);
+    free_portaudio(audio_stream);
+    free_allegro(display, event_queue, timer);
 
     return 0;
 }
