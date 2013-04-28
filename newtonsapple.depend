@@ -1,9 +1,9 @@
 # depslib dependency file v1.0
-1366707637 source:m:\newtonsapple\helpers.c
+1366711236 source:m:\newtonsapple\helpers.c
 	"helpers.h"
 	"globals.h"
 
-1366702868 m:\newtonsapple\helpers.h
+1366706468 m:\newtonsapple\helpers.h
 	"globals.h"
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
@@ -11,7 +11,7 @@
 	<stdlib.h>
 	<stdio.h>
 
-1367068865 m:\newtonsapple\globals.h
+1367149381 m:\newtonsapple\globals.h
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
 
@@ -224,7 +224,7 @@
 
 1366209522 m:\c\include\portaudio\portaudio.h
 
-1367070633 source:m:\newtonsapple\main.c
+1367148670 source:m:\newtonsapple\main.c
 	<stdio.h>
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
@@ -246,7 +246,7 @@
 	"allegro5/allegro.h"
 	"allegro5/allegro_font.h"
 
-1366964588 m:\newtonsapple\scenes.h
+1367148478 m:\newtonsapple\scenes.h
 	<allegro5/allegro.h>
 	<allegro5/allegro_font.h>
 	<allegro5/allegro_image.h>
@@ -255,15 +255,15 @@
 	"helpers.h"
 	"game.h"
 
-1367068680 m:\newtonsapple\game.h
+1367143983 m:\newtonsapple\game.h
 	"globals.h"
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
 
-1367070370 source:m:\newtonsapple\scenes.c
+1367149411 source:m:\newtonsapple\scenes.c
 	"scenes.h"
 
-1367070596 source:m:\newtonsapple\game.c
+1367149406 source:m:\newtonsapple\game.c
 	"globals.h"
 	"game.h"
 	"helpers.h"

@@ -32,8 +32,8 @@ enum
 
 enum physics_modes
 {
-    ABSOLUTE,
-    WRT_APPLE
+    MODE_ABSOLUTE,
+    MODE_WRT_APPLE
 };
 
 enum object_ctr

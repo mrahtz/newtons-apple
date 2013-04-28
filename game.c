@@ -149,9 +149,9 @@ void update_physics(object *objects, int n, int mode)
     o->x_vel += o->x_acc;
     o->y_vel += o->y_acc;
 
-    if (mode == ABSOLUTE) {
+    if (mode == MODE_ABSOLUTE) {
         o->x_pos += o->x_vel;
-    } else if (mode == WRT_APPLE) {
+    } else if (mode == MODE_WRT_APPLE) {
         if (n == BIRD)
             o->x_pos += o->x_vel + objects[APPLE].x_vel / 5.0;
         if (n != APPLE)
@@ -182,10 +182,10 @@ int simulate_objects(object *objects, const float audio_level)
         if (i == APPLE)
             o->y_acc = G - 5*audio_level;
 
-        update_physics(objects, i, WRT_APPLE);
+        update_physics(objects, i, MODE_WRT_APPLE);
         //printf("%f %f\n", o->x_pos, o->y_pos);
 
-        if (i != APPLE && 
+        if (i != APPLE &&
                 !objects[APPLE].destroyed &&
                 check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;

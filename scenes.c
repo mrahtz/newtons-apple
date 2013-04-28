@@ -98,7 +98,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree)
 
     if (t >= DROP_T) {
         // so this updates the absolute position of the apple
-        update_physics(objects, APPLE, ABSOLUTE);
+        update_physics(objects, APPLE, MODE_ABSOLUTE);
         // now do another update considering the scene movement
         objects[APPLE].x_pos -= camera_vel;
         if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)    // gone a little too far...
@@ -127,7 +127,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree)
 
     t++;
 
-    if (apple_was_offscreen && 
+    if (apple_was_offscreen &&
             objects[APPLE].x_pos == INIT_APPLE_X)
         return 1;
     else
@@ -165,7 +165,7 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
         bm = instructions1;
     }
 
-    update_physics(objects, APPLE, WRT_APPLE);
+    update_physics(objects, APPLE, MODE_WRT_APPLE);
     rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
     draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
     if (t > PAUSE_T)
