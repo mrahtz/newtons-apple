@@ -11,7 +11,7 @@
 	<stdlib.h>
 	<stdio.h>
 
-1367149381 m:\newtonsapple\globals.h
+1367159577 m:\newtonsapple\globals.h
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
 
@@ -224,7 +224,7 @@
 
 1366209522 m:\c\include\portaudio\portaudio.h
 
-1367148670 source:m:\newtonsapple\main.c
+1367163618 source:m:\newtonsapple\main.c
 	<stdio.h>
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
@@ -235,9 +235,10 @@
 	<stdlib.h>
 	<time.h>
 	"globals.h"
-	"scenes.h"
-	"game.h"
-	"helpers.h"
+	"utilities.h"
+	"resources.h"
+	"audio.h"
+	"tick.h"
 
 1330868172 m:\c\include\allegro\allegro5\allegro_font.h
 	"allegro5/allegro.h"
@@ -246,21 +247,21 @@
 	"allegro5/allegro.h"
 	"allegro5/allegro_font.h"
 
-1367148478 m:\newtonsapple\scenes.h
+1367163815 m:\newtonsapple\scenes.h
 	<allegro5/allegro.h>
 	<allegro5/allegro_font.h>
 	<allegro5/allegro_image.h>
 	<math.h>
 	"globals.h"
-	"helpers.h"
-	"game.h"
+	"graphics.h"
+	"physics.h"
 
 1367143983 m:\newtonsapple\game.h
 	"globals.h"
 	<allegro5/allegro.h>
 	<allegro5/allegro_image.h>
 
-1367149411 source:m:\newtonsapple\scenes.c
+1367164390 source:m:\newtonsapple\scenes.c
 	"scenes.h"
 
 1367149406 source:m:\newtonsapple\game.c
@@ -481,4 +482,60 @@
 1350686779 m:\w2k\downloads\allegro\include\allegro5\allegro_ttf.h
 	"allegro5/allegro.h"
 	"allegro5/allegro_font.h"
+
+1367163768 source:m:\newtonsapple\graphics.c
+	"graphics.h"
+
+1367164154 m:\newtonsapple\graphics.h
+	<allegro5/allegro.h>
+	<allegro5/allegro_image.h>
+	"globals.h"
+	"utilities.h"
+
+1367164088 m:\newtonsapple\utilities.h
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<stdarg.h>
+
+1367164059 m:\newtonsapple\resources.h
+	<allegro5/allegro_font.h>
+	<allegro5/allegro_ttf.h>
+	<allegro5/allegro_image.h>
+	"globals.h"
+	"utilities.h"
+	"graphics.h"
+
+1367164901 m:\newtonsapple\audio.h
+	<portaudio.h>
+	<math.h>
+	<stdio.h>
+	"globals.h"
+
+1367164057 m:\newtonsapple\tick.h
+	<allegro5/allegro.h>
+	<allegro5/allegro_image.h>
+	<allegro5/allegro_font.h>
+	"globals.h"
+	"scenes.h"
+
+1367164035 m:\newtonsapple\physics.h
+	"globals.h"
+	"graphics.h"
+	"utilities.h"
+
+1367163755 source:m:\newtonsapple\physics.c
+	"physics.h"
+
+1367160202 source:m:\newtonsapple\resources.c
+	"resources.h"
+
+1367162917 source:m:\newtonsapple\tick.c
+	"tick.h"
+
+1367157208 source:m:\newtonsapple\utilities.c
+	"utilities.h"
+
+1367155741 source:m:\newtonsapple\audio.c
+	"audio.h"
 

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="game.c" open="1" top="1" tabpos="4">
-		<Cursor position="6679" topLine="205" />
+	<File name="audio.c" open="1" top="0" tabpos="1">
+		<Cursor position="94" topLine="0" />
 	</File>
-	<File name="globals.h" open="1" top="0" tabpos="3">
+	<File name="audio.h" open="1" top="0" tabpos="2">
+		<Cursor position="563" topLine="0" />
+	</File>
+	<File name="globals.h" open="0" top="0" tabpos="3">
 		<Cursor position="541" topLine="0" />
 	</File>
-	<File name="helpers.h" open="0" top="0" tabpos="0">
-		<Cursor position="208" topLine="0" />
-	</File>
-	<File name="main.c" open="1" top="0" tabpos="2">
+	<File name="main.c" open="0" top="0" tabpos="2">
 		<Cursor position="285" topLine="0" />
 	</File>
-	<File name="scenes.c" open="1" top="0" tabpos="1">
-		<Cursor position="3974" topLine="86" />
+	<File name="scenes.c" open="1" top="1" tabpos="3">
+		<Cursor position="3303" topLine="67" />
 	</File>
 </CodeBlocks_layout_file>

@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Release">
 				<Option output="newtonsapple" prefix_auto="1" extension_auto="1" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
@@ -36,22 +36,38 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="game.c">
+		<Unit filename="audio.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="game.h" />
+		<Unit filename="audio.h" />
 		<Unit filename="globals.h" />
-		<Unit filename="helpers.c">
+		<Unit filename="graphics.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="helpers.h" />
+		<Unit filename="graphics.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="physics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="physics.h" />
+		<Unit filename="resources.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="resources.h" />
 		<Unit filename="scenes.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="scenes.h" />
+		<Unit filename="tick.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tick.h" />
+		<Unit filename="utilities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="utilities.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

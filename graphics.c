@@ -54,7 +54,7 @@ void draw_objects_with_animate(const object *objects, int animate_time)
 
     for (i = 0; i < LAST_MOVER; i++)
         draw_object_sprite_n(&objects[i], sprite_n);
-    al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
+    draw_object_sprite_n(&objects[GROUND], 1);
 
     animate_timer++;
 }

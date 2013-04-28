@@ -3,6 +3,7 @@
 
 #include <portaudio.h>
 #include <math.h> // for fabs() in record_callback
+#include <stdio.h>
 #include "globals.h"
 
 void check_pa_err(char *where, PaError err);

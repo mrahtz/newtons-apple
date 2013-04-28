@@ -181,7 +181,8 @@ void reset_objects(object *objects)
         objects[i].timer = 0;
         reset_object_physics(objects, i);
     }
-    // initially just newton and the apple on screen
+    // initially just the ground, newton and apple visible on screen
+    objects[GROUND].destroyed = 0;
     objects[APPLE].destroyed = 0;
     objects[NEWTON].destroyed = 0;
 }
