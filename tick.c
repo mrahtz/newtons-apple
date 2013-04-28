@@ -52,7 +52,7 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
         game_state->scene = GAME;
     case GAME:
         gameover = game_tick(objects, audio_level, &(game_state->lives), &(game_state->score));
-        draw_game(objects, display, font, game_state->lives, game_state->score);
+        draw_game(objects, display, font, game_state->score, game_state->lives);
         if (gameover == 1)
             game_state->scene = GAMEOVER;
         break;

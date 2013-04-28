@@ -48,7 +48,6 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree)
 {
     static int t = 0;
     static float camera_vel = 0;
-    static int sprite_n = 2;
     static int apple_was_offscreen = 0;
     static int tree_x = -30;
     int tree_height = al_get_bitmap_height(tree);
@@ -60,13 +59,10 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree)
     const int APPLE_OFFSET_X = 100;
     const float CAMERA_SLOWDOWN_K = 0.13; // derived experimentally :(
 
-    ALLEGRO_BITMAP *newton_sprite;
-
     if (t == 0) {
         reset_object_physics(objects, APPLE);
         reset_object_physics(objects, NEWTON);
         objects[APPLE].x_pos = APPLE_OFFSET_X;
-        sprite_n = 2;  // asleep
     } if (t == DROP_T) {
         objects[APPLE].x_acc = 0;
         objects[APPLE].y_acc = 0.1;
@@ -105,22 +101,18 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree)
             objects[APPLE].x_pos = INIT_APPLE_X;
     }
 
-    if (t == GUST_T)
-        sprite_n = 0;   // awake!
-    if (t >= CAMERA_MOVE_T && t % ANIMATE_TIME == 0)
-        sprite_n = !sprite_n;   // running!
+    if (t >= CAMERA_MOVE_T)
+        draw_objects_with_animate(objects, (int) (300/camera_vel)); // running!
+    else {
+        draw_object_sprite_n(&objects[GROUND], 1);
+        draw_object_sprite_n(&objects[APPLE], 1);
+        if (t > GUST_T) // awake!
+            draw_object_sprite_n(&objects[NEWTON], 1);
+        else    // still asleep
+            draw_object_sprite_n(&objects[NEWTON], 3);
+    }
 
-    if (sprite_n == 0)
-        newton_sprite = objects[NEWTON].sprite1; // running 1
-    else if (sprite_n == 1)
-        newton_sprite = objects[NEWTON].sprite2; // running 2
-    else //if (sprite_n == 2)
-        newton_sprite = objects[NEWTON].sprite3; // asleep
-
-    al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
     al_draw_bitmap(tree, tree_x, tree_y, 0);
-    al_draw_bitmap(objects[APPLE].sprite1, objects[APPLE].x_pos, objects[APPLE].y_pos, 0);
-    al_draw_bitmap(newton_sprite, objects[NEWTON].x_pos, objects[NEWTON].y_pos, 0);
 
     rotate_ground(objects[GROUND].sprite1, display, (int) round(camera_vel));
     tree_x = tree_x - camera_vel;
@@ -139,8 +131,7 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
 {
     static int t = 0;
     static int loop = 0;
-    ALLEGRO_BITMAP *bm = instructions1; // by default
-
+    ALLEGRO_BITMAP *instructions = instructions1; // by default
 
     const int PAUSE_T = 60;
     // pause
@@ -156,13 +147,13 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
     if (t >= PAUSE_T &&
             objects[APPLE].y_pos > CANVAS_HEIGHT * 0.4) {   // too low!
         objects[APPLE].y_acc = -G;    // bloooow!
-        bm = instructions2;
+        instructions = instructions2;
     } else if (t >= PAUSE_T &&
             objects[APPLE].y_pos < CANVAS_HEIGHT * 0.4) {  // high enough, stop blowing
         if (objects[APPLE].y_acc != G) // we've just switched
             loop++;
         objects[APPLE].y_acc = G;
-        bm = instructions1;
+        instructions = instructions1;
     }
 
     update_physics(objects, APPLE, MODE_WRT_APPLE);
@@ -170,10 +161,9 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
     // draw newton and the apple
     objects[APPLE].destroyed = 0;
     objects[NEWTON].destroyed = 0;
-    draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
+    draw_objects_with_animate(objects, (int) 300/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
     if (t > PAUSE_T)
-        al_draw_bitmap(bm, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
-    al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
+        al_draw_bitmap(instructions, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
 
     t++;
 
@@ -232,8 +222,7 @@ void draw_game(const object *objects,
     int font_line_height = al_get_font_line_height(font);
 
     rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
-    al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
-    draw_objects(objects, (int) 100/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
+    draw_objects_with_animate(objects, (int) 300/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
 
     sprintf(score_str, "Score: %d", score);
     al_draw_text(font, al_map_rgb(255,255,255),

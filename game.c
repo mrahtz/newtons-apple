@@ -245,28 +245,41 @@ void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
     al_set_target_backbuffer(display);
 }
 
-void draw_objects(const object *objects, int animate_time)
+void draw_objects_with_animate(const object *objects, int animate_time)
 {
     static int animate_timer = 0;
-    static int sprite_n = 0;
+    static int last_switch = 0;
+    static int sprite_n = 1;
+
     enum object_ctr i;
 
-    if (animate_time != 0 &&   // 0 -> don't animate
-            animate_timer % animate_time == 0)
-        sprite_n = !sprite_n;
+    if (animate_time != 0 &&    // 0 -> don't animate
+            animate_timer - last_switch >= animate_time) {
+        last_switch = animate_timer;
 
-    for (i = 0; i < LAST_MOVER; i++) {
-        const object *o = &objects[i];
-
-        if (o->destroyed)
-            continue;
-
-        if (sprite_n == 0) {
-            // dx, dy, flags (delta because relative to current postion)
-            al_draw_bitmap(o->sprite1, (int) o->x_pos, (int) o->y_pos, 0);
-        } else
-            al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);    // dx, dy, flags (delta because relative to curr-> pos->)
+        if (sprite_n == 1)
+            sprite_n = 2;
+        else
+            sprite_n = 1;
     }
 
+    for (i = 0; i < LAST_MOVER; i++)
+        draw_object_sprite_n(&objects[i], sprite_n);
+    al_draw_bitmap(objects[GROUND].sprite1, objects[GROUND].x_pos, objects[GROUND].y_pos, 0);
+
     animate_timer++;
+}
+
+void draw_object_sprite_n(const object *o, int sprite_n)
+{
+    if (o->destroyed)
+        return;
+
+    if (sprite_n == 1) {
+        // dx, dy, flags (delta because relative to current postion)
+        al_draw_bitmap(o->sprite1, (int) o->x_pos, (int) o->y_pos, 0);
+    } else if (sprite_n == 2) 
+        al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);
+    else if (sprite_n == 3)
+        al_draw_bitmap(o->sprite3, (int) o->x_pos, (int) o->y_pos, 0);
 }
