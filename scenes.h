@@ -6,7 +6,8 @@
 #include <allegro5/allegro_image.h>
 #include <math.h>	// for pow() in show_intro
 #include "globals.h"
-#include "game.h"
+#include "graphics.h"
+#include "physics.h"
 
 void show_titlescreen(ALLEGRO_FONT *font, object *newton);
 void init_game(game_state_struct *game_state, object *objects);

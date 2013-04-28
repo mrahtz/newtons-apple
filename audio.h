@@ -1,3 +1,6 @@
+#ifndef AUDIO_H
+#define AUDIO_H
+
 #include <portaudio.h>
 #include <math.h> // for fabs() in record_callback
 #include "globals.h"
@@ -10,3 +13,5 @@ int record_callback(const void *inputBuffer, void *outputBuffer,
                     void *userdata);
 PaStream * init_portaudio(float *userdata);
 void free_portaudio(PaStream *audio_stream);
+
+#endif

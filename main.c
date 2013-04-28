@@ -9,8 +9,6 @@
 #include <time.h>
 
 #include "globals.h"
-#include "scenes.h"
-#include "game.h"
 #include "utilities.h"
 #include "resources.h"
 #include "audio.h"
