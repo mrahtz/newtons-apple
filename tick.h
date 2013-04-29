@@ -9,6 +9,6 @@
 
 void handle_click(int *scene);
 void tick(game_state_struct *state, float audio_level, object *objects,
-        ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, intro_resource_struct *intro_resources);
+          ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, intro_resource_struct *intro_resources);
 
 #endif

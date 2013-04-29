@@ -63,6 +63,7 @@ typedef struct
     float x_vel, y_vel; // velocity
     float reset_x_vel;    // only used for apple - save vel after instructions finished
     float x_pos, y_pos; // position
+    int width, height;
     int destroyed;      // whether the object should be drawn
     int timer;          // time since object destroyed (0 = don't count)
     int respawn_interval;

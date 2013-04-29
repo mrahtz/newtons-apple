@@ -3,7 +3,7 @@
 const float G = 0.1;
 
 // returns 1 if apple was hit, otherwise 0
-int simulate_objects(object *objects, const float audio_level)
+int simulate_objects(object *objects, float audio_level)
 {
     enum object_ctr i;
 
@@ -22,7 +22,7 @@ int simulate_objects(object *objects, const float audio_level)
             continue;
 
         if (i == APPLE)
-            o->y_acc = G - 5*audio_level;
+            o->y_acc = G - MIC_SENSITIVITY*audio_level;
 
         update_physics(objects, i, MODE_WRT_APPLE);
         //printf("%f %f\n", o->x_pos, o->y_pos);
@@ -52,7 +52,7 @@ int simulate_objects(object *objects, const float audio_level)
         return 0;
 }
 
-int check_collision(const object *o1, const object *o2)
+int check_collision(object *o1, object *o2)
 {
     // half-dimensions of object 1
     int o1_hwidth = al_get_bitmap_width(o1->sprite1)/2;

@@ -88,7 +88,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
         camera_vel = (float) APPLE_INIT_VEL; // for want of a better value
     }
 
-    int apple_is_offscreen = (check_if_offscreen((const object *) &objects[APPLE]) == 1);
+    int apple_is_offscreen = (check_if_offscreen(&objects[APPLE]) == 1);
     if (apple_is_offscreen) {
         objects[APPLE].y_pos = INIT_APPLE_Y;       // in the right place when the game starts
         objects[APPLE].y_vel = 0;
@@ -140,7 +140,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
                      "?");
     }
 
-    rotate_ground(objects[GROUND].sprite1, display, (int) round(camera_vel));
+    rotate_ground(&objects[GROUND], display, (int) round(camera_vel));
     tree_x = tree_x - camera_vel;
 
     t++;
@@ -183,7 +183,7 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
     }
 
     update_physics(objects, APPLE, MODE_WRT_APPLE);
-    rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
+    rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
     draw_objects_with_animate(objects, (int) 300/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
     if (t > PAUSE_T)
         al_draw_bitmap(instructions, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
@@ -239,14 +239,14 @@ int game_tick(object *objects, const float audio_level, int *lives, int *score)
 }
 
 // al_draw_bitmap doesn't take consts so can't const their parameters :(
-void draw_game(const object *objects,
+void draw_game(object *objects,
                ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
                const int score, const int lives)
 {
     char lives_str[20], score_str[20];
     int font_line_height = al_get_font_line_height(font);
 
-    rotate_ground(objects[GROUND].sprite1, display, objects[APPLE].x_vel);
+    rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
     draw_objects_with_animate(objects, (int) 300/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
 
     sprintf(score_str, "Score: %d", score);

@@ -1,6 +1,7 @@
 #include "resources.h"
 
 // this isn't needed anywhere else
+// TODO does this really belong here?
 static void load_respawn(object *o, int n)
 {
     switch(n) {
@@ -38,6 +39,8 @@ void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources,
     }
     objects[GROUND].sprite1 = al_load_bitmap("ground.png");
     objects[GROUND].sprite2 = objects[GROUND].sprite3 = NULL;
+    objects[GROUND].width = al_get_bitmap_width(objects[GROUND].sprite1);
+    objects[GROUND].height = al_get_bitmap_height(objects[GROUND].sprite1);
     objects[GROUND].x_pos = 0;
     objects[GROUND].y_pos = CANVAS_HEIGHT-1 -
                             al_get_bitmap_height(objects[GROUND].sprite1) + 1;

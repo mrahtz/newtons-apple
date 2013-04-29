@@ -3,7 +3,7 @@
 void check_pa_err(char *where, PaError err)
 {
     if (err != paNoError) {
-        fprintf(stderr, "audio error at %s: %s\n", where, Pa_GetErrorText(err));
+        fprintf(stderr, "audio error at %s: %s\n", where, Pa_GetErrorText(err)); // TODO better errors
         exit(1);
     }
 }

@@ -1,40 +1,43 @@
 #include "graphics.h"
 
-void rotate_ground(ALLEGRO_BITMAP *ground, ALLEGRO_DISPLAY *display, int amount)
+void rotate_ground(object *ground, ALLEGRO_DISPLAY *display, int amount)
 {
-    int width = al_get_bitmap_width(ground);
-    int height = al_get_bitmap_height(ground);
+    int width = ground->width;
+    int height = ground->height;
+    ALLEGRO_BITMAP *bm = ground->sprite1;
     ALLEGRO_COLOR *saved;
 
     // if rotating more than the width,
     // only rotate the different between the amount and the width
     amount %= width+1;
 
-    al_lock_bitmap(ground,
+    al_lock_bitmap(bm,
                    ALLEGRO_PIXEL_FORMAT_ANY,    // pixel format
                    ALLEGRO_LOCK_READWRITE);     // mode
-    al_set_target_bitmap(ground);
+    al_set_target_bitmap(bm);
     saved = malloc(sizeof(ALLEGRO_COLOR) * amount);
 
     int y, x;
     for (y = 0; y < height; y++) {
         // save the pixels on the left, to rotate round later
         for (x = 0; x < amount; x++)
-            saved[x] = al_get_pixel(ground, x, y);
+            saved[x] = al_get_pixel(bm, x, y);
         // shift pixels to the left
         for (x = 0; x < width-amount; x++)
-            al_put_pixel(x, y, al_get_pixel(ground, x+amount, y));
+            al_put_pixel(x, y, al_get_pixel(bm, x+amount, y));
         // stick the saved first pixel back on the end
         for (x = width-amount; x < width; x++)
             al_put_pixel(x, y, saved[x-(width-amount)]);
     }
 
-    al_unlock_bitmap(ground);
+    free(saved);
+
+    al_unlock_bitmap(bm);
 
     al_set_target_backbuffer(display);
 }
 
-void draw_objects_with_animate(const object *objects, int animate_time)
+void draw_objects_with_animate(object *objects, int animate_time)
 {
     static int animate_timer = 0;
     static int last_switch = 0;
@@ -59,7 +62,7 @@ void draw_objects_with_animate(const object *objects, int animate_time)
     animate_timer++;
 }
 
-void draw_object_sprite_n(const object *o, int sprite_n)
+void draw_object_sprite_n(object *o, int sprite_n)
 {
     if (o->destroyed)
         return;
@@ -73,7 +76,7 @@ void draw_object_sprite_n(const object *o, int sprite_n)
         al_draw_bitmap(o->sprite3, (int) o->x_pos, (int) o->y_pos, 0);
 }
 
-int check_if_offscreen(const object *o)
+int check_if_offscreen(object *o)
 {
     int o_width = al_get_bitmap_width(o->sprite1);
     int o_height = al_get_bitmap_height(o->sprite1);
@@ -118,4 +121,6 @@ void init_sprite(object *o, int object_n)
     o->sprite2 = al_load_bitmap(sprite2_fn);
     if (!o->sprite1 || !o->sprite2)
         die("couldn't load sprites for objects[%d]\n", object_n);
+    o->width = al_get_bitmap_width(o->sprite1);
+    o->height = al_get_bitmap_height(o->sprite1);
 }

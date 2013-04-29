@@ -15,10 +15,9 @@ void reset_objects(object *objects);
 int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, ALLEGRO_FONT *font);
 int show_instructions(object *objects, ALLEGRO_DISPLAY *display,
 	ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2);
-void draw_game(const object *objects,
-               ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
-               const int score, const int lives);
-int game_tick(object *objects, const float audio_level, int *lives, int *score);
+void draw_game(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
+               int score, int lives);
+int game_tick(object *objects, float audio_level, int *lives, int *score);
 void show_gameover(int score, ALLEGRO_FONT *font);
 
 #endif
