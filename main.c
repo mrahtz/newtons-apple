@@ -66,12 +66,18 @@ int main(void)
     intro_resource_struct intro_resources;
     object objects[OBJECTS_END];
 
+    // just used in main
+    ALLEGRO_BITMAP *head_bitmap;
+
     game_state_struct game_state;
 
     // initialisation
     {
         srand(time(NULL));
         display = init_allegro(&event_queue, &timer);
+        al_set_window_title(display, "Newton's Apple");
+        head_bitmap = al_load_bitmap("newtonhead.png");
+        al_set_display_icon(display, head_bitmap);
         audio_stream = init_portaudio(&audio_level);
         load_resources(&font, &intro_resources, objects);
         reset_objects(objects);
@@ -93,6 +99,7 @@ int main(void)
             break;
     }
 
+    al_destroy_bitmap(head_bitmap);
     free_resources(font, &intro_resources, objects);
     free_portaudio(audio_stream);
     free_allegro(display, event_queue, timer);
