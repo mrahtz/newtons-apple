@@ -273,12 +273,12 @@ void show_gameover(int score, ALLEGRO_FONT *font)
                  ALLEGRO_ALIGN_CENTRE, score_str);
     al_draw_text(font, al_map_rgb(255,255,255),
                  CANVAS_WIDTH/2, CANVAS_HEIGHT/2 - font_line_height,
-                 ALLEGRO_ALIGN_CENTRE, "Play again? :)");
+                 ALLEGRO_ALIGN_CENTRE, "Play again?");
 
     al_draw_text(font, al_map_rgb(255,255,255),
                  CANVAS_WIDTH * 2.0/6, CANVAS_HEIGHT/2 + font_line_height,
-                 ALLEGRO_ALIGN_CENTRE, "Ja!");
+                 ALLEGRO_ALIGN_CENTRE, "Yeah!");
     al_draw_text(font, al_map_rgb(255,255,255),
                  CANVAS_WIDTH * 4.0/6, CANVAS_HEIGHT/2 + font_line_height,
-                 ALLEGRO_ALIGN_CENTRE, "Nein!");
+                 ALLEGRO_ALIGN_CENTRE, "Quit");
 }
