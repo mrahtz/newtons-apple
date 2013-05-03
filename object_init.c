@@ -1,5 +1,7 @@
 #include "object_init.h"
 
+static void reset_object_position(object *objects, int object_n);
+
 void load_respawn(object *o, int n)
 {
     switch(n) {
@@ -27,34 +29,6 @@ void reset_objects(object *objects)
     objects[GROUND].destroyed = 0;
     objects[APPLE].destroyed = 0;
     objects[NEWTON].destroyed = 0;
-}
-
-void reset_object_position(object *objects, int object_n)
-{
-    int newton_width, newton_height;
-    object *o = &objects[object_n];
-    o->x_pos = o->y_pos = 0;
-
-    switch (object_n) {
-        case APPLE:
-            o->x_pos = INIT_APPLE_X; o->y_pos = INIT_APPLE_Y;
-            break;
-        case PROJECTILE:
-            newton_width = al_get_bitmap_height(objects[NEWTON].sprite1);
-            newton_height = al_get_bitmap_width(objects[NEWTON].sprite1);
-            o->x_pos = objects[NEWTON].x_pos + newton_width + 5;
-            o->y_pos = objects[NEWTON].y_pos - newton_height - 5;
-            break;
-        case BIRD:
-            o->x_pos = -al_get_bitmap_width(objects[NEWTON].sprite1);
-            o->y_pos = rand_between(0, CANVAS_HEIGHT/2);
-            break;
-        case NEWTON:
-            o->x_pos = CANVAS_HEIGHT/10;
-            int newton_height = al_get_bitmap_height(objects[NEWTON].sprite1);
-            objects[NEWTON].y_pos = objects[GROUND].y_pos - newton_height - 1;
-            break;
-    }
 }
 
 extern const float G;   // declared in physics.c
@@ -86,5 +60,33 @@ void reset_object_physics(object *objects, int object_n)
 
         case NEWTON:
             break;      // Newton stays still, nothing to do :)
+    }
+}
+
+static void reset_object_position(object *objects, int object_n)
+{
+    int newton_width, newton_height;
+    object *o = &objects[object_n];
+    o->x_pos = o->y_pos = 0;
+
+    switch (object_n) {
+        case APPLE:
+            o->x_pos = INIT_APPLE_X; o->y_pos = INIT_APPLE_Y;
+            break;
+        case PROJECTILE:
+            newton_width = al_get_bitmap_height(objects[NEWTON].sprite1);
+            newton_height = al_get_bitmap_width(objects[NEWTON].sprite1);
+            o->x_pos = objects[NEWTON].x_pos + newton_width + 5;
+            o->y_pos = objects[NEWTON].y_pos - newton_height - 5;
+            break;
+        case BIRD:
+            o->x_pos = -al_get_bitmap_width(objects[NEWTON].sprite1);
+            o->y_pos = rand_between(0, CANVAS_HEIGHT/2);
+            break;
+        case NEWTON:
+            o->x_pos = CANVAS_HEIGHT/10;
+            int newton_height = al_get_bitmap_height(objects[NEWTON].sprite1);
+            objects[NEWTON].y_pos = objects[GROUND].y_pos - newton_height - 1;
+            break;
     }
 }
