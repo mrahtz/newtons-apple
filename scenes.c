@@ -82,6 +82,8 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
     // step 1: figure out where the apple should be
     {
         if (t == 0) {
+            object *a = &objects[APPLE];
+            a->x_vel = a->y_vel = a->x_acc = a->y_acc = 0;
             objects[APPLE].x_pos = APPLE_OFFSET_X;
             objects[APPLE].y_pos = APPLE_OFFSET_Y;
         } if (t == DROP_T) {
@@ -115,12 +117,14 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
     }
 
     // step 3: update physics
-    if (t >= DROP_T) {
+    {
         // so this updates the absolute position of the apple
         update_physics(objects, APPLE, MODE_ABSOLUTE);
         // now do another update considering the scene movement
         objects[APPLE].x_pos -= camera_vel;
-        if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)    // gone a little too far...
+        // if the apple has come back onscreen, check it hasn't
+        // gone past where it should be
+        if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)
             objects[APPLE].x_pos = INIT_APPLE_X;
     }
 

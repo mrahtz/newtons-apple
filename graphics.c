@@ -55,8 +55,10 @@ void draw_objects_with_animate(object *objects, int animate_time)
             sprite_n = 1;
     }
 
-    for (i = 0; i < LAST_MOVER; i++)
-        draw_object_sprite_n(&objects[i], sprite_n);
+    for (i = 0; i < LAST_MOVER; i++) {
+        if (! objects[i].destroyed)
+            draw_object_sprite_n(&objects[i], sprite_n);
+    }
     draw_object_sprite_n(&objects[GROUND], 1);
 
     animate_timer++;
@@ -64,11 +66,7 @@ void draw_objects_with_animate(object *objects, int animate_time)
 
 void draw_object_sprite_n(object *o, int sprite_n)
 {
-    if (o->destroyed)
-        return;
-
     if (sprite_n == 1) {
-        // dx, dy, flags (delta because relative to current postion)
         al_draw_bitmap(o->sprite1, (int) o->x_pos, (int) o->y_pos, 0);
     } else if (sprite_n == 2) 
         al_draw_bitmap(o->sprite2, (int) o->x_pos, (int) o->y_pos, 0);
