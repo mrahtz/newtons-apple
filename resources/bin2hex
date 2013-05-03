@@ -1,0 +1,15 @@
+#!/bin/bash
+
+name=${1/./}
+filename=packed_resources.c
+cat >> $filename << EOF
+unsigned char ${name}[] = {
+EOF
+
+hexdump -ve '8/1 "0x%02x, " "\n"' $1 | sed 's/, 0x //g' | sed 's/ ,$//g' >> $filename
+
+cat >> $filename << EOF
+};
+EOF
+
+printf "int ${name}_size = %d;\n" $(stat -f "%z" $1) >> $filename

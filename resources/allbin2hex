@@ -1,0 +1,24 @@
+#!/bin/bash
+
+target=packed_resources.c
+
+cat > $target << EOF
+#ifndef IMAGES_H
+#define IMAGES_H
+EOF
+for file in *.png *.ttf
+do
+name=${file/./_}
+cat >> $target << EOF
+unsigned char ${name}[] = {
+EOF
+
+hexdump -ve '8/1 "0x%02x, " "\n"' $file | sed 's/, 0x //g' | sed 's/ ,$//g' >> $target
+
+cat >> $target << EOF
+};
+EOF
+
+printf "int ${name}_size = %d;\n" $(stat -f "%z" $file) >> $target
+done
+echo '#endif' >> $target

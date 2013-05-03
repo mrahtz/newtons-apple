@@ -1,11 +1,13 @@
 #include "audio.h"
 
-void check_pa_err(char *where, PaError err)
+int check_pa_err(char *where, PaError err)
 {
     if (err != paNoError) {
         fprintf(stderr, "audio error at %s: %s\n", where, Pa_GetErrorText(err)); // TODO better errors
-        exit(1);
+        //exit(1);
+        return 1;
     }
+    return 0;
 }
 
 // stores average amplitude of buffer in userData pointer
@@ -34,7 +36,8 @@ PaStream * init_portaudio(float *userdata)
     PaError err;
 
     err = Pa_Initialize();
-    check_pa_err("init", err);
+    if (check_pa_err("init", err))
+        return NULL;
     err = Pa_OpenDefaultStream( &stream,
                                 1,          // 1 input channel
                                 0,          // no output channels
@@ -43,9 +46,11 @@ PaStream * init_portaudio(float *userdata)
                                 256,        // frames per buffer
                                 record_callback,
                                 userdata );
-    check_pa_err("stream open", err);
+    if (check_pa_err("stream open", err))
+        return NULL;
     err = Pa_StartStream(stream);
-    check_pa_err("stream start", err);
+    if (check_pa_err("stream start", err))
+        return NULL;
     
     return stream;
 }

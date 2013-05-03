@@ -88,39 +88,3 @@ int check_if_offscreen(object *o)
 
     return offscreen_x || offscreen_y;
 }
-
-void init_sprite(object *o, int object_n)
-{
-    char sprite1_fn[20], sprite2_fn[20];
-
-    // so can call al_destroy_bitmap on them later,
-    // even if they're unused
-    o->sprite1 = o->sprite2 = o->sprite3 = NULL;
-
-    switch (object_n) {
-        case APPLE:
-            strcpy(sprite1_fn, "apple.png");
-            strcpy(sprite2_fn, "apple.png");
-            break;
-        case BIRD:
-            strcpy(sprite1_fn, "bird1.png");
-            strcpy(sprite2_fn, "bird2.png");
-            break;
-        case PROJECTILE:
-            strcpy(sprite1_fn, "book.png");
-            strcpy(sprite2_fn, "book.png");
-            break;
-        case NEWTON:
-            strcpy(sprite1_fn, "newton1.png");
-            strcpy(sprite2_fn, "newton2.png");
-            o->sprite3 = al_load_bitmap("newton_asleep.png");
-            //break;
-    }
-
-    o->sprite1 = al_load_bitmap(sprite1_fn);
-    o->sprite2 = al_load_bitmap(sprite2_fn);
-    if (!o->sprite1 || !o->sprite2)
-        die("couldn't load sprites for objects[%d]\n", object_n);
-    o->width = al_get_bitmap_width(o->sprite1);
-    o->height = al_get_bitmap_height(o->sprite1);
-}

@@ -1,4 +1,6 @@
 #include "resources.h"
+// contains hex dumps of images and font in arrays
+#include "resources/packed_resources.c"
 
 // this isn't needed anywhere else
 // TODO does this really belong here?
@@ -17,27 +19,88 @@ static void load_respawn(object *o, int n)
     }
 }
 
+ALLEGRO_FONT * load_packed_font(unsigned char *mem, int mem_size, int font_size)
+{
+        ALLEGRO_FILE *mem_file = al_open_memfile(mem, mem_size, "r");
+        // "The filename (second arg) is only used to find possible additional files next to a font file."
+        // ? But works with just a blank string
+        ALLEGRO_FONT *font = al_load_ttf_font_f(mem_file, "", font_size, 0); // last variable flags
+        // https://www.allegro.cc/manual/5/al_load_ttf_font_f
+        // "The file handle is owned by the returned ALLEGRO_FONT object and must not be freed by the caller,
+        //  as FreeType expects to be able to read from it at a later time."
+        return font;
+}
+
+ALLEGRO_BITMAP * load_packed_bitmap(unsigned char *mem, int mem_size)
+{
+        ALLEGRO_FILE *mem_file = al_open_memfile(mem, mem_size, "r");
+        // file type determined by second arg
+        ALLEGRO_BITMAP *bm = al_load_bitmap_f(mem_file, ".png");
+        al_fclose(mem_file);
+
+        return bm;
+}
+
+static void init_sprite(object *o, int object_n)
+{
+    int size1, size2;
+    unsigned char *mem1, *mem2;
+
+    // so can call al_destroy_bitmap on them later,
+    // even if they're unused
+    o->sprite1 = o->sprite2 = o->sprite3 = NULL;
+
+    switch (object_n) {
+        case APPLE:
+            mem1 = mem2 = apple_png;
+            size1 = size2 = apple_png_size;
+            break;
+        case BIRD:
+            mem1 = bird1_png;
+            mem2 = bird2_png;
+            size1 = bird1_png_size;
+            size2 = bird2_png_size;
+            break;
+        case PROJECTILE:
+            mem1 = mem2 = book_png;
+            size1 = size2 = book_png_size;
+            break;
+        case NEWTON:
+            mem1 = newton1_png;
+            mem2 = newton2_png;
+            size1 = size2 = newton1_png_size;
+            o->sprite3 = load_packed_bitmap(newton_asleep_png, newton_asleep_png_size);
+            break;
+    }
+
+    o->sprite1 = load_packed_bitmap(mem1, size1);
+    o->sprite2 = load_packed_bitmap(mem2, size2);
+    if (!o->sprite1 || !o->sprite2)
+        die("couldn't load sprites for objects[%d]\n", object_n);
+    o->width = al_get_bitmap_width(o->sprite1);
+    o->height = al_get_bitmap_height(o->sprite1);
+}
+
 void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources, object *objects)
 {
-    *font = al_load_ttf_font("Arial.ttf",
+    *font = load_packed_font(Arial_ttf, Arial_ttf_size, 36);
+    /**font = al_load_ttf_font("Arial.ttf",
                             36,     // size
-                            0);     // flags
+                            0);     // flags*/
     if (!(*font))
         die("couldn't load font\n");
-    intro_resources->font = al_load_ttf_font("Arial.ttf",
-                                             20,
-                                             0);
+    intro_resources->font = load_packed_font(Arial_ttf, Arial_ttf_size, 20);
 
-    intro_resources->instructions1 = al_load_bitmap("instructions1.png");
-    intro_resources->instructions2 = al_load_bitmap("instructions2.png");
-    intro_resources->tree = al_load_bitmap("tree.png");
+    intro_resources->instructions1 = load_packed_bitmap(instructions1_png, instructions1_png_size);
+    intro_resources->instructions2 = load_packed_bitmap(instructions2_png, instructions2_png_size);
+    intro_resources->tree = load_packed_bitmap(tree_png, tree_png_size);
 
     enum object_ctr i;
     for (i = 0; i < LAST_MOVER; i++) {
         init_sprite(&objects[i], i);
         load_respawn(&objects[i], i);
     }
-    objects[GROUND].sprite1 = al_load_bitmap("ground.png");
+    objects[GROUND].sprite1 = load_packed_bitmap(ground_png, ground_png_size);
     objects[GROUND].sprite2 = objects[GROUND].sprite3 = NULL;
     objects[GROUND].width = al_get_bitmap_width(objects[GROUND].sprite1);
     objects[GROUND].height = al_get_bitmap_height(objects[GROUND].sprite1);

@@ -3,6 +3,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_native_dialog.h>
 #include <portaudio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -13,6 +14,11 @@
 #include "resources.h"
 #include "audio.h"
 #include "tick.h"
+
+// defined in images/images.c, which is included
+// by resources.c
+extern unsigned char newtonhead_png[];
+extern int newtonhead_png_size;
 
 ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER **timer)
 {
@@ -50,6 +56,19 @@ void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *event_queue, AL
     al_destroy_display(display);
 }
 
+/*void show_error_dialog(ALLEGRO_DISPLAY *display, char *text)
+{
+    al_init_native_dialog_addon();
+    char *title = "Error";
+    char *heading = "Failed to grab microphone";
+    char *buttons = "Quit";
+    al_show_native_message_box(display, title, heading, text, buttons, ALLEGRO_MESS
+    int al_show_native_message_box(ALLEGRO_DISPLAY *display,
+    char const *title, char const *heading, char const *text,
+    char const *buttons, int flags)
+    al_shutdown_native_dialog_addon();
+}*/
+
 int main(void)
 {
     // stuff for init_allegro
@@ -76,8 +95,10 @@ int main(void)
         srand(time(NULL));
         display = init_allegro(&event_queue, &timer);
         al_set_window_title(display, "Newton's Apple");
-        head_bitmap = al_load_bitmap("newtonhead.png");
+
+        head_bitmap = load_packed_bitmap(newtonhead_png, newtonhead_png_size);
         al_set_display_icon(display, head_bitmap);
+
         audio_stream = init_portaudio(&audio_level);
         load_resources(&font, &intro_resources, objects);
         reset_objects(objects);
