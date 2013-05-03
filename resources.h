@@ -9,6 +9,7 @@
 #include "globals.h"
 #include "utilities.h"
 #include "graphics.h"
+#include "object_init.h"
 
 ALLEGRO_FONT * load_packed_font(unsigned char *mem, int mem_size, int font_size);
 ALLEGRO_BITMAP * load_packed_bitmap(unsigned char *mem, int size);

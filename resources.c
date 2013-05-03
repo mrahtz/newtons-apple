@@ -2,23 +2,6 @@
 // contains hex dumps of images and font in arrays
 #include "resources/packed_resources.c"
 
-// this isn't needed anywhere else
-// TODO does this really belong here?
-static void load_respawn(object *o, int n)
-{
-    switch(n) {
-        case APPLE:
-            o->respawn_interval = APPLE_RESPAWN_INTERVAL;
-            break;
-        case PROJECTILE:
-            o->respawn_interval = (int) PROJECTILE_RESPAWN_INTERVAL * rand_between(1.0, 2.0);
-            break;
-        case BIRD:
-            o->respawn_interval = (int) BIRD_RESPAWN_INTERVAL * rand_between(1.0, 2.0);
-            break;
-    }
-}
-
 ALLEGRO_FONT * load_packed_font(unsigned char *mem, int mem_size, int font_size)
 {
         ALLEGRO_FILE *mem_file = al_open_memfile(mem, mem_size, "r");

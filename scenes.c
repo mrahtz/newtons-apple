@@ -196,20 +196,6 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
         return 0;
 }
 
-void reset_objects(object *objects)
-{
-    enum object_ctr i;
-    for (i = 0; i < LAST_MOVER; i++) {
-        objects[i].destroyed = 1;
-        objects[i].timer = 0;
-        reset_object_physics(objects, i);
-    }
-    // initially just the ground, newton and apple visible on screen
-    objects[GROUND].destroyed = 0;
-    objects[APPLE].destroyed = 0;
-    objects[NEWTON].destroyed = 0;
-}
-
 void init_game(game_state_struct *game_state, object *objects)
 {
     game_state->score = 0;
