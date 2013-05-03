@@ -79,7 +79,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
     int puzzle_label_y = objects[NEWTON].y_pos + 10;
 
 
-    // step 1: figure out where the apple should be
+    // step 1: figure out what the apple's doing
     {
         if (t == 0) {
             object *a = &objects[APPLE];
@@ -126,12 +126,15 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
         // gone past where it should be
         if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)
             objects[APPLE].x_pos = INIT_APPLE_X;
+
+        rotate_ground(&objects[GROUND], display, (int) round(camera_vel));
+        tree_x -= camera_vel;
     }
 
-    // draw the scene
+    // step 4: draw the scene
     {
         if (t >= CAMERA_MOVE_T)
-            draw_objects_with_animate(objects, (int) (300/camera_vel)); // running!
+            draw_objects_with_animate(objects, camera_vel); // running!
         else {
             draw_object_sprite_n(&objects[GROUND], 1);
             draw_object_sprite_n(&objects[APPLE], 1);
@@ -157,14 +160,11 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
         }
     }
 
-    rotate_ground(&objects[GROUND], display, (int) round(camera_vel));
-    tree_x = tree_x - camera_vel;
-
     t++;
 
     if (apple_was_offscreen &&
             objects[APPLE].x_pos == INIT_APPLE_X)
-        return 1;
+        return 1;   // finished
     else
         return 0;
 }
@@ -173,16 +173,10 @@ extern const float G;   // defined in physics.c
 int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2)
 {
     static int t = 0;
-    static int loop = 0;
+    static int times_blown = 0;
     ALLEGRO_BITMAP *instructions = instructions1; // by default
 
     const int PAUSE_T = 60;
-    // pause
-    // fall
-    // if too low, blow
-    // if too high, stop
-    // if too low, blow
-    // if too high, stop
 
     if (t == PAUSE_T)
         objects[APPLE].y_acc = G;
@@ -194,20 +188,20 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
     } else if (t >= PAUSE_T &&
             objects[APPLE].y_pos < CANVAS_HEIGHT * 0.4) {  // high enough, stop blowing
         if (objects[APPLE].y_acc != G) // we've just switched
-            loop++;
+            times_blown++;
         objects[APPLE].y_acc = G;
         instructions = instructions1;
     }
 
     update_physics(objects, APPLE, MODE_WRT_APPLE);
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
-    draw_objects_with_animate(objects, (int) 300/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
+    draw_objects_with_animate(objects, objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
     if (t > PAUSE_T)
         al_draw_bitmap(instructions, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
 
     t++;
 
-    if (loop == 3)
+    if (times_blown == 3)
         return 1;
     else
         return 0;
@@ -250,8 +244,8 @@ void draw_game(object *objects,
     int font_line_height = al_get_font_line_height(font);
 
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
-    draw_objects_with_animate(objects, (int) 300/objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
-
+    // second arg animate interval - faster as apple goes faster
+    draw_objects_with_animate(objects, objects[APPLE].x_vel);
     sprintf(score_str, "Score: %d", score);
     al_draw_text(font, al_map_rgb(255,255,255),
                  10, 10,

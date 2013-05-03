@@ -37,7 +37,7 @@ void rotate_ground(object *ground, ALLEGRO_DISPLAY *display, int amount)
     al_set_target_backbuffer(display);
 }
 
-void draw_objects_with_animate(object *objects, int animate_time)
+void draw_objects_with_animate(object *objects, int velocity)
 {
     static int animate_timer = 0;
     static int last_switch = 0;
@@ -45,6 +45,7 @@ void draw_objects_with_animate(object *objects, int animate_time)
 
     enum object_ctr i;
 
+    int animate_time = (int) 300/velocity;
     if (animate_time != 0 &&    // 0 -> don't animate
             animate_timer - last_switch >= animate_time) {
         last_switch = animate_timer;
