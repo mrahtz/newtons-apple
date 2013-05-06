@@ -65,7 +65,7 @@ typedef struct
     float x_pos, y_pos; // position
     int width, height;
     int destroyed;      // whether the object should be drawn
-    int timer;          // time since object destroyed (0 = don't count)
+    int respawn_timer;          // time since object destroyed (0 = don't count)
     int respawn_interval;
     int invincibility_timer;    // only used for apple
 } object;

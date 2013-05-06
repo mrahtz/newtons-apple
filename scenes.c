@@ -216,8 +216,8 @@ void init_game(game_state_struct *game_state, object *objects)
         // give the player some time to get used to things
         if (i == BIRD || i == PROJECTILE) {
             objects[i].destroyed = 1;
-            //objects[i].timer = (int) INIT_SPAWN_INTERVAL * rand_between(1.0, 3.0);
-            objects[i].timer = 60;
+            //objects[i].respawn_timer = (int) INIT_SPAWN_INTERVAL * rand_between(1.0, 3.0);
+            objects[i].respawn_timer = 60;
         }
     }
 }

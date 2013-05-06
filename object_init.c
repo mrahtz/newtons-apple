@@ -22,7 +22,7 @@ void reset_objects(object *objects)
     enum object_ctr i;
     for (i = 0; i < LAST_MOVER; i++) {
         objects[i].destroyed = 1;
-        objects[i].timer = 0;
+        objects[i].respawn_timer = 0;
         objects[i].invincibility_timer = 0;
         reset_object_physics(objects, i);
     }
