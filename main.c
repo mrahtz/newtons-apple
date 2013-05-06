@@ -103,8 +103,6 @@ int main(void)
         load_resources(&font, &intro_resources, objects);
         reset_objects(objects);
         game_state.scene = TITLE;
-            game_state.scene = INIT_GAME_WITH_RESET;
-            objects[APPLE].reset_x_vel = 5;
     }
 
     // game loop
