@@ -7,15 +7,20 @@ int simulate_objects(object *objects, float audio_level)
 {
     enum object_ctr i;
 
+    if (objects[APPLE].invincibility_timer != 0)
+        objects[APPLE].invincibility_timer--;
+
     for (i = 0; i < LAST_MOVER; i++) {
         object *o = &objects[i];
 
         // handle respawn timing
         if  (o->timer != 0)
-            o->timer -= 1;
+            o->timer--;
         else if (o->destroyed && o->timer == 0) {   // time to respawn
             o->timer = 0;
             o->destroyed = 0;
+            if (i == APPLE)
+                o->invincibility_timer = APPLE_INVINCIBILITY_TIME;
             reset_object_physics(objects, i);
         }
         if (o->destroyed)
@@ -29,6 +34,7 @@ int simulate_objects(object *objects, float audio_level)
 
         if (i != APPLE &&
                 !objects[APPLE].destroyed &&
+                objects[APPLE].invincibility_timer == 0 &&
                 check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;
             objects[APPLE].timer = objects[APPLE].respawn_interval;
@@ -45,6 +51,7 @@ int simulate_objects(object *objects, float audio_level)
             o->timer = o->respawn_interval;
         }
     }
+    
     // apple has just been destroyed
     if (objects[APPLE].timer == objects[APPLE].respawn_interval)
         return 1;

@@ -23,6 +23,7 @@ void reset_objects(object *objects)
     for (i = 0; i < LAST_MOVER; i++) {
         objects[i].destroyed = 1;
         objects[i].timer = 0;
+        objects[i].invincibility_timer = 0;
         reset_object_physics(objects, i);
     }
     // initially just the ground, newton and apple visible on screen

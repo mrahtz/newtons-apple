@@ -27,6 +27,7 @@ enum
     ANIMATE_TIME = 10,
     INIT_SPAWN_INTERVAL = 120,
     APPLE_RESPAWN_INTERVAL = 30,
+    APPLE_INVINCIBILITY_TIME = 360,
     PROJECTILE_RESPAWN_INTERVAL = 60,
     BIRD_RESPAWN_INTERVAL = 110,
     INIT_APPLE_X = CANVAS_WIDTH/2,      // so that the intro sequence can check
@@ -66,6 +67,7 @@ typedef struct
     int destroyed;      // whether the object should be drawn
     int timer;          // time since object destroyed (0 = don't count)
     int respawn_interval;
+    int invincibility_timer;    // only used for apple
 } object;
 
 typedef struct

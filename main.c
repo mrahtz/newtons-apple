@@ -20,7 +20,7 @@
 extern unsigned char newtonhead_png[];
 extern int newtonhead_png_size;
 
-ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER **timer)
+ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER **frame_timer)
 {
     ALLEGRO_DISPLAY *display;
 
@@ -36,22 +36,22 @@ ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER 
     display = al_create_display(CANVAS_WIDTH, CANVAS_HEIGHT);
 
     *event_queue = al_create_event_queue();
-    // TODO free this timer?
-    *timer = al_create_timer(1/60.0);
-    if (!(*timer))
-        die("couldn't create timer\n");
-    al_start_timer(*timer);
+    // TODO free this frame_timer?
+    *frame_timer = al_create_timer(1/60.0);
+    if (!(*frame_timer))
+        die("couldn't create frame_timer\n");
+    al_start_timer(*frame_timer);
 
     al_register_event_source(*event_queue, al_get_display_event_source(display));
-    al_register_event_source(*event_queue, al_get_timer_event_source(*timer));
+    al_register_event_source(*event_queue, al_get_timer_event_source(*frame_timer));
     al_register_event_source(*event_queue, al_get_mouse_event_source());
 
     return display;
 }
 
-void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *event_queue, ALLEGRO_TIMER *timer)
+void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *event_queue, ALLEGRO_TIMER *frame_timer)
 {
-    al_destroy_timer(timer);
+    al_destroy_timer(frame_timer);
     al_destroy_event_queue(event_queue); 
     al_destroy_display(display);
 }
@@ -73,7 +73,7 @@ int main(void)
 {
     // stuff for init_allegro
     ALLEGRO_EVENT_QUEUE *event_queue;
-    ALLEGRO_TIMER *timer;
+    ALLEGRO_TIMER *frame_timer;
     ALLEGRO_DISPLAY *display;
 
     // stuff for init_audio
@@ -93,7 +93,7 @@ int main(void)
     // initialisation
     {
         srand(time(NULL));
-        display = init_allegro(&event_queue, &timer);
+        display = init_allegro(&event_queue, &frame_timer);
         al_set_window_title(display, "Newton's Apple");
 
         head_bitmap = load_packed_bitmap(newtonhead_png, newtonhead_png_size);
@@ -123,7 +123,7 @@ int main(void)
     al_destroy_bitmap(head_bitmap);
     free_resources(font, &intro_resources, objects);
     free_portaudio(audio_stream);
-    free_allegro(display, event_queue, timer);
+    free_allegro(display, event_queue, frame_timer);
 
     return 0;
 }
