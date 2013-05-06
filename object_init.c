@@ -6,13 +6,13 @@ void load_respawn(object *o, int n)
 {
     switch(n) {
         case APPLE:
-            o->respawn_interval = APPLE_RESPAWN_INTERVAL;
+            o->respawn_timer = APPLE_RESPAWN_INTERVAL;
             break;
         case PROJECTILE:
-            o->respawn_interval = (int) PROJECTILE_RESPAWN_INTERVAL * rand_between(1.0, 2.0);
+            o->respawn_timer = (int) PROJECTILE_RESPAWN_INTERVAL * rand_between(1.0, 5.0);
             break;
         case BIRD:
-            o->respawn_interval = (int) BIRD_RESPAWN_INTERVAL * rand_between(1.0, 2.0);
+            o->respawn_timer = (int) BIRD_RESPAWN_INTERVAL * rand_between(1.0, 5.0);
             break;
     }
 }

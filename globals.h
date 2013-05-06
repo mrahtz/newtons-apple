@@ -66,7 +66,6 @@ typedef struct
     int width, height;
     int destroyed;      // whether the object should be drawn
     int respawn_timer;          // time since object destroyed (0 = don't count)
-    int respawn_interval;
     int invincibility_timer;    // only used for apple
 } object;
 

@@ -87,3 +87,25 @@ int check_if_offscreen(object *o)
 
     return offscreen_x || offscreen_y;
 }
+
+// al_draw_bitmap doesn't take consts so can't const their parameters :(
+void draw_game(object *objects,
+               ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
+               int score, int lives)
+{
+    char lives_str[20], score_str[20];
+    int font_line_height = al_get_font_line_height(font);
+
+    rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
+    // second arg animate interval - faster as apple goes faster
+    draw_objects_with_animate(objects, objects[APPLE].x_vel);
+    sprintf(score_str, "Score: %d", score);
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 10, 10,
+                 ALLEGRO_ALIGN_LEFT, score_str);
+
+    sprintf(lives_str, "Lives left: %d", lives);
+    al_draw_text(font, al_map_rgb(255,255,255),
+                 10, 10+font_line_height,
+                 ALLEGRO_ALIGN_LEFT, lives_str);
+}
