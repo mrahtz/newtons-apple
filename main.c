@@ -103,6 +103,7 @@ int main(void)
         load_resources(&font, &intro_resources, objects);
 
         game_state.scene = INIT_TITLE;
+        game_state.ticks = 0;
     }
 
     // game loop

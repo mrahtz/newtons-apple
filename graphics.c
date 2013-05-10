@@ -45,7 +45,11 @@ void draw_objects_with_animate(object *objects, int velocity)
 
     enum object_ctr i;
 
-    int animate_time = (int) 300/velocity;
+    int animate_time;
+    if (velocity == 0)
+        animate_time = 0;
+    else
+        animate_time = (int) 300/velocity;
     if (animate_time != 0 &&    // 0 -> don't animate
             animate_timer - last_switch >= animate_time) {
         last_switch = animate_timer;

@@ -32,7 +32,7 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
         game_state->scene = TITLE;
         // drop through
     case TITLE:
-        show_titlescreen(font, &objects[NEWTON]);
+        show_titlescreen(font, &objects[NEWTON], game_state->ticks);
         break;
 
     case INIT_INTRO:
@@ -75,4 +75,5 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
     }
 
     al_flip_display();
+    game_state->ticks++;
 }

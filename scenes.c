@@ -1,10 +1,9 @@
 #include "scenes.h"
 
-void show_titlescreen(ALLEGRO_FONT *font, object *newton)
+void show_titlescreen(ALLEGRO_FONT *font, object *newton, int ticks)
 {
     const int min_x = CANVAS_WIDTH * 1.0/4;
     const int max_x = CANVAS_WIDTH * 3.0/4;
-    static int animate_timer = 0;
     ALLEGRO_BITMAP *sprite;
     int font_line_height = al_get_font_line_height(font);
 
@@ -16,7 +15,7 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
 
     // x % 10 ranges from 0 to 9
     // half is from 0 to 4, other half from 5 to 9
-    if (animate_timer % 10 <= 4)
+    if (ticks % 10 <= 4)
         sprite = newton->sprite1;
     else
         sprite = newton->sprite2;
@@ -33,8 +32,6 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
     al_draw_bitmap(sprite,
                    newton->x_pos, newton->y_pos,
                    newton->x_vel < 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);   // flags
-
-    animate_timer++;
 }
 
 extern const float G;   // was defined in game.c

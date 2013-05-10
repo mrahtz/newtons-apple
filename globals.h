@@ -84,6 +84,7 @@ typedef struct
     int scene;
     int score;
     int lives; 
+    int ticks;
 } game_state_struct;
 
 #endif
