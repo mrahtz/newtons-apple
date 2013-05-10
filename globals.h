@@ -12,6 +12,7 @@ enum game_states
     TITLE,
     INIT_INTRO,
     INTRO,
+    INIT_INSTRUCTIONS,
     INSTRUCTIONS,
     INIT_GAME_WITH_RESET,
     INIT_GAME,
@@ -74,10 +75,10 @@ typedef struct
 
 typedef struct
 {
-    ALLEGRO_BITMAP *tree;
     ALLEGRO_BITMAP *instructions1;
     ALLEGRO_BITMAP *instructions2;
     ALLEGRO_FONT *font; // small font for showing labels on Newton
+    int times_blown;
 } intro_resource_struct;
 
 typedef struct

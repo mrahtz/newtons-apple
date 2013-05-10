@@ -156,25 +156,24 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
 }
 
 extern const float G;   // defined in physics.c
-int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2)
+int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2, int ticks)
 {
-    static int t = 0;
-    static int times_blown = 0;
     ALLEGRO_BITMAP *instructions = instructions1; // by default
+    int cycle_finished = 0;
 
     const int PAUSE_T = 60;
 
-    if (t == PAUSE_T)
+    if (ticks == PAUSE_T)
         objects[APPLE].y_acc = G;
 
-    if (t >= PAUSE_T &&
+    if (ticks >= PAUSE_T &&
             objects[APPLE].y_pos > CANVAS_HEIGHT * 0.4) {   // too low!
         objects[APPLE].y_acc = -G;    // bloooow!
         instructions = instructions2;
-    } else if (t >= PAUSE_T &&
+    } else if (ticks >= PAUSE_T &&
             objects[APPLE].y_pos < CANVAS_HEIGHT * 0.4) {  // high enough, stop blowing
         if (objects[APPLE].y_acc != G) // we've just switched
-            times_blown++;
+            cycle_finished = 1;
         objects[APPLE].y_acc = G;
         instructions = instructions1;
     }
@@ -182,15 +181,10 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
     update_physics(objects, APPLE, MODE_WRT_APPLE);
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
     draw_objects_with_animate(objects, objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
-    if (t > PAUSE_T)
+    if (ticks > PAUSE_T)
         al_draw_bitmap(instructions, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
 
-    t++;
-
-    if (times_blown == 3)
-        return 1;
-    else
-        return 0;
+    return cycle_finished;
 }
 
 void init_game(game_state_struct *game_state, object *objects)

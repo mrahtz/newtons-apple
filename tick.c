@@ -19,7 +19,7 @@ void handle_click(int *scene)
 void tick(game_state_struct *game_state, float audio_level, object *objects,
         ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, intro_resource_struct *intro_resources)
 {
-    int finished, gameover;
+    int finished, gameover, cycle_finished;
 
     al_clear_to_color(al_map_rgb(135, 206, 235));
 
@@ -46,13 +46,20 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
     case INTRO:
         finished = show_intro(objects, display, intro_resources->font, game_state->ticks);
         if (finished == 1)
-            game_state->scene = INSTRUCTIONS;
+            game_state->scene = INIT_INSTRUCTIONS;
         break;
 
+    case INIT_INSTRUCTIONS:
+        game_state->ticks = 0;
+        game_state->scene = INSTRUCTIONS;
+        intro_resources->times_blown = 0;
     case INSTRUCTIONS:
-        finished = show_instructions(objects, display,
-            intro_resources->instructions1, intro_resources->instructions2);
-        if (finished == 1) {
+        cycle_finished = show_instructions(objects, display,
+            intro_resources->instructions1, intro_resources->instructions2,
+            game_state->ticks);
+        if (cycle_finished)
+            intro_resources->times_blown++;
+        if (intro_resources->times_blown == 3) {
             // reset to current velocity when apple is destroyed
             objects[APPLE].reset_x_vel = objects[APPLE].x_vel;
             game_state->scene = INIT_GAME;
