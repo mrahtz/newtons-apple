@@ -48,7 +48,6 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
 
     const int APPLE_OFFSET_X = 100;
     const int APPLE_OFFSET_Y = 120;
-    static int apple_was_offscreen = 0;
     int apple_is_offscreen, apple_is_onscreen;
 
     object *newton = &objects[NEWTON];
@@ -89,7 +88,6 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
             objects[APPLE].y_acc = 0;
             // x_vel stays the same after the gust
             objects[APPLE].x_acc = 0;
-            apple_was_offscreen = 1;
         }
     }
 
@@ -149,7 +147,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
         }
     }
 
-    if (apple_was_offscreen &&
+    if (newton->x_vel > 0 &&
             objects[APPLE].x_pos == INIT_APPLE_X) {
         newton->x_vel = 0; // ready for main game scene
         return 1;   // finished
