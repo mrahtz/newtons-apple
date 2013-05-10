@@ -98,9 +98,10 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
         if (ticks == CAMERA_MOVE_T)
             newton->x_vel = CAMERA_INIT_VEL;
         // if before newton catching up to apple, accelerate
-        if ( ! (apple_was_offscreen && apple_is_onscreen))
+        if (newton->x_vel > 0 && apple_is_offscreen)
             newton->x_vel *= CAMERA_SPEEDUP_K;
-        else // use negative feedback to sync with apple speed
+        // once caught up, use negative feedback to sync with apple speed
+        else if (newton->x_vel > 0 && apple_is_onscreen)
             newton->x_vel -= CAMERA_SLOWDOWN_K*(newton->x_vel - objects[APPLE].x_vel);
     }
 
@@ -110,9 +111,9 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
         update_physics(objects, APPLE, MODE_ABSOLUTE);
         // now do another update considering the scene movement
         objects[APPLE].x_pos -= newton->x_vel;
-        // if the apple has come back onscreen, check it hasn't
-        // gone past where it should be
-        if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)
+        // once the apple has come back onscreen, (after Newton runs after it),
+        // check it hasn't gone past where it should be
+        if (newton->x_vel > 0 && objects[APPLE].x_pos <= INIT_APPLE_X)
             objects[APPLE].x_pos = INIT_APPLE_X;
 
         rotate_ground(&objects[GROUND], display, (int) round(newton->x_vel));
