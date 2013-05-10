@@ -10,10 +10,10 @@ int simulate_objects(object *objects, float audio_level)
     if (objects[APPLE].invincibility_timer != 0)
         objects[APPLE].invincibility_timer--;
 
+    // handle respawn timing
     for (i = 0; i < LAST_MOVER; i++) {
         object *o = &objects[i];
 
-        // handle respawn timing
         if  (o->respawn_timer != 0)
             o->respawn_timer--;
         else if (o->destroyed && o->respawn_timer == 0) {   // time to respawn
@@ -23,6 +23,11 @@ int simulate_objects(object *objects, float audio_level)
                 o->invincibility_timer = APPLE_INVINCIBILITY_TIME;
             reset_object_physics(objects, i);
         }
+    }
+
+    for (i = 0; i < LAST_MOVER; i++) {
+        object *o = &objects[i];
+
         if (o->destroyed)
             continue;
 
@@ -31,22 +36,23 @@ int simulate_objects(object *objects, float audio_level)
 
         update_physics(objects, i, MODE_WRT_APPLE);
         //printf("%f %f\n", o->x_pos, o->y_pos);
+        if (i == APPLE && o->y_pos < 0) {
+            o->y_pos = 0; // cap the apple to the top of the screen
+            o->y_vel = 0;
+        }
 
         if (i != APPLE &&
                 !objects[APPLE].destroyed &&
                 objects[APPLE].invincibility_timer == 0 &&
                 check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;
+            load_respawn(&objects[APPLE], APPLE);
             load_respawn(o, i);
         }
 
-        if (i == APPLE && o->y_pos < 0) {
-            o->y_pos = 0; // cap the apple to the top of the screen
-            o->y_vel = 0;
-        }
         if ( (check_if_offscreen(o) == 1 ||
-              check_ground_collision(o, &objects[GROUND]) == 1 )
-                && !o->destroyed) {
+              check_ground_collision(o, &objects[GROUND]) == 1)
+                && !o->destroyed ) {
             o->destroyed = 1;
             load_respawn(o, i);
         }
