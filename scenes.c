@@ -4,22 +4,22 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
 {
     const int min_x = CANVAS_WIDTH * 1.0/4;
     const int max_x = CANVAS_WIDTH * 3.0/4;
-    static int x = CANVAS_WIDTH * 1.0/4;
-    static int direction = 0;   // 0 = right, 1 = left
     static int animate_timer = 0;
-    static int sprite_n = 0;
     ALLEGRO_BITMAP *sprite;
     int font_line_height = al_get_font_line_height(font);
 
-    if (direction == 0 && x == max_x)
-        direction = !direction;
-    else if (direction == 1 && x == min_x)
-        direction = !direction;
+    if ((newton->x_vel > 0 && newton->x_pos == max_x) ||
+        (newton->x_vel < 0 && newton->x_pos == min_x))
+            newton->x_vel *= -1;
 
-    if (direction == 0)
-        x += 2;
+    newton->x_pos += newton->x_vel;
+
+    // x % 10 ranges from 0 to 9
+    // half is from 0 to 4, other half from 5 to 9
+    if (animate_timer % 10 <= 4)
+        sprite = newton->sprite1;
     else
-        x -= 2;
+        sprite = newton->sprite2;
 
     al_draw_text(font, al_map_rgb(255,255,255),
                  CANVAS_WIDTH/2, CANVAS_HEIGHT * 1/3.0,
@@ -30,15 +30,9 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton)
                  ALLEGRO_ALIGN_CENTRE,
                  "Click to play!");
 
-    if (animate_timer % 5 == 0)
-        sprite_n = !sprite_n;
-    if (sprite_n == 0)
-        sprite = newton->sprite1;
-    else
-        sprite = newton->sprite2;
     al_draw_bitmap(sprite,
-                   x, CANVAS_HEIGHT * 4.0/6,
-                   direction == 1 ? ALLEGRO_FLIP_HORIZONTAL : 0);   // flags
+                   newton->x_pos, newton->y_pos,
+                   newton->x_vel < 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);   // flags
 
     animate_timer++;
 }
@@ -59,8 +53,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
     const int APPLE_OFFSET_X = 100;
     const int APPLE_OFFSET_Y = 120;
     static int apple_was_offscreen = 0;
-    int apple_is_offscreen = (check_if_offscreen(&objects[APPLE]) == 1);
-    int apple_is_onscreen = !apple_is_offscreen;
+    int apple_is_offscreen, apple_is_onscreen;
 
     static int tree_x = -30;
     int tree_height = al_get_bitmap_height(tree);
@@ -95,6 +88,8 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
             objects[APPLE].y_acc = -0.2;
             objects[APPLE].x_acc = 0.3;
         }
+        apple_is_offscreen = (check_if_offscreen(&objects[APPLE]) == 1);
+        apple_is_onscreen = !apple_is_offscreen;
         if (apple_is_offscreen) {
             objects[APPLE].y_pos = INIT_APPLE_Y;       // in the right place when the game starts
             objects[APPLE].y_vel = 0;

@@ -3,7 +3,7 @@
 void handle_click(int *scene)
 {
     if (*scene == TITLE)
-        *scene = INTRO;
+        *scene = INIT_INTRO;
     else if (*scene == GAMEOVER) {
         ALLEGRO_MOUSE_STATE m_state;
         al_get_mouse_state(&m_state);
@@ -24,10 +24,22 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
     al_clear_to_color(al_map_rgb(135, 206, 235));
 
     switch (game_state->scene) {
+    case INIT_TITLE:
+        // Newton's state for the title screen
+        objects[NEWTON].x_pos = CANVAS_WIDTH * 1.0/4;
+        objects[NEWTON].y_pos = CANVAS_HEIGHT * 2.0/3;
+        objects[NEWTON].x_vel = 2;
+        game_state->scene = TITLE;
+        // drop through
     case TITLE:
         show_titlescreen(font, &objects[NEWTON]);
         break;
 
+    case INIT_INTRO:
+        objects[APPLE].reset_x_vel = 0;
+        reset_objects(objects);
+        game_state->scene = INTRO;
+        // drop through
     case INTRO:
         finished = show_intro(objects, display, intro_resources->tree, intro_resources->font);
         if (finished == 1)

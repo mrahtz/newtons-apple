@@ -101,8 +101,8 @@ int main(void)
 
         audio_stream = init_portaudio(&audio_level);
         load_resources(&font, &intro_resources, objects);
-        reset_objects(objects);
-        game_state.scene = TITLE;
+
+        game_state.scene = INIT_TITLE;
     }
 
     // game loop

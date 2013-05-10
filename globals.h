@@ -8,7 +8,9 @@
 // TODO justify use of enums rather than defines
 enum game_states
 {
+    INIT_TITLE,
     TITLE,
+    INIT_INTRO,
     INTRO,
     INSTRUCTIONS,
     INIT_GAME_WITH_RESET,
