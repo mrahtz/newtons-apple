@@ -56,7 +56,7 @@ void reset_object_physics(object *objects, int object_n)
             break;
 
         case BIRD:
-            o->x_vel = 1;
+            o->x_vel = 0.5;
             break;
 
         case NEWTON:

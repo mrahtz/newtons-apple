@@ -35,9 +35,8 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton, int ticks)
 }
 
 extern const float G;   // was defined in game.c
-int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, ALLEGRO_FONT *font)
+int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, int ticks)
 {
-    static int t = 0;
     enum times {
         LABEL_VANISH_T = 100,
         DROP_T = 220,
@@ -52,11 +51,8 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
     static int apple_was_offscreen = 0;
     int apple_is_offscreen, apple_is_onscreen;
 
-    static int tree_x = -30;
-    int tree_height = al_get_bitmap_height(tree);
-    int tree_y = objects[GROUND].y_pos - tree_height;
-
-    static float camera_vel = 0;
+    object *newton = &objects[NEWTON];
+    object *tree = &objects[TREE];
     const int CAMERA_INIT_VEL = 5;
     const float CAMERA_SPEEDUP_K = 1.01;
     const float CAMERA_SLOWDOWN_K = 0.13; // derived experimentally :(
@@ -71,17 +67,17 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
 
     // step 1: figure out what the apple's doing
     {
-        if (t == 0) {
+        if (ticks == 0) {
             object *a = &objects[APPLE];
             a->x_vel = a->y_vel = a->x_acc = a->y_acc = 0;
             objects[APPLE].x_pos = APPLE_OFFSET_X;
             objects[APPLE].y_pos = APPLE_OFFSET_Y;
-        } if (t == DROP_T) {
+        } if (ticks == DROP_T) {
             objects[APPLE].x_acc = 0;
             objects[APPLE].y_acc = 0.1;
             objects[APPLE].x_vel = 0;
             objects[APPLE].y_vel = 0;
-        } else if (t == GUST_T) {
+        } else if (ticks == GUST_T) {
             objects[APPLE].y_acc = -0.2;
             objects[APPLE].x_acc = 0.3;
         }
@@ -99,13 +95,13 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
 
     // step 2: figure out what the camera should be doing
     {
-        if (t == CAMERA_MOVE_T)
-            camera_vel = CAMERA_INIT_VEL;
+        if (ticks == CAMERA_MOVE_T)
+            newton->x_vel = CAMERA_INIT_VEL;
         // if before newton catching up to apple, accelerate
         if ( ! (apple_was_offscreen && apple_is_onscreen))
-            camera_vel *= CAMERA_SPEEDUP_K;
+            newton->x_vel *= CAMERA_SPEEDUP_K;
         else // use negative feedback to sync with apple speed
-            camera_vel -= CAMERA_SLOWDOWN_K*(camera_vel - objects[APPLE].x_vel);
+            newton->x_vel -= CAMERA_SLOWDOWN_K*(newton->x_vel - objects[APPLE].x_vel);
     }
 
     // step 3: update physics
@@ -113,38 +109,38 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
         // so this updates the absolute position of the apple
         update_physics(objects, APPLE, MODE_ABSOLUTE);
         // now do another update considering the scene movement
-        objects[APPLE].x_pos -= camera_vel;
+        objects[APPLE].x_pos -= newton->x_vel;
         // if the apple has come back onscreen, check it hasn't
         // gone past where it should be
         if (apple_was_offscreen && objects[APPLE].x_pos <= INIT_APPLE_X)
             objects[APPLE].x_pos = INIT_APPLE_X;
 
-        rotate_ground(&objects[GROUND], display, (int) round(camera_vel));
-        tree_x -= camera_vel;
+        rotate_ground(&objects[GROUND], display, (int) round(newton->x_vel));
+        tree->x_pos -= newton->x_vel;
     }
 
     // step 4: draw the scene
     {
-        if (t >= CAMERA_MOVE_T)
-            draw_objects_with_animate(objects, camera_vel); // running!
+        if (ticks >= CAMERA_MOVE_T)
+            draw_objects_with_animate(objects, newton->x_vel); // running!
         else {
             draw_object_sprite_n(&objects[GROUND], 1);
             draw_object_sprite_n(&objects[APPLE], 1);
-            if (t > GUST_T) // awake!
-                draw_object_sprite_n(&objects[NEWTON], 1);
+            if (ticks > GUST_T) // awake!
+                draw_object_sprite_n(newton, 1);
             else    // still asleep
-                draw_object_sprite_n(&objects[NEWTON], 3);
+                draw_object_sprite_n(newton, 3);
         }
 
-        al_draw_bitmap(tree, tree_x, tree_y, 0);
+        draw_object_sprite_n(tree, 1);
 
-        if (t <= LABEL_VANISH_T) {
+        if (ticks <= LABEL_VANISH_T) {
             al_draw_text(font, al_map_rgb(255,255,255),
                          newton_label_x, newton_label_y,
                          ALLEGRO_ALIGN_LEFT,
                          "Isaac Newton");
         }
-        if (t >= PUZZLE_START_T && t <= PUZZLE_END_T) {
+        if (ticks >= PUZZLE_START_T && ticks <= PUZZLE_END_T) {
             al_draw_text(font, al_map_rgb(255,255,255),
                          puzzle_label_x, puzzle_label_y,
                          ALLEGRO_ALIGN_LEFT,
@@ -152,12 +148,11 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *tree, 
         }
     }
 
-    t++;
-
     if (apple_was_offscreen &&
-            objects[APPLE].x_pos == INIT_APPLE_X)
+            objects[APPLE].x_pos == INIT_APPLE_X) {
+        newton->x_vel = 0; // ready for main game scene
         return 1;   // finished
-    else
+    } else
         return 0;
 }
 

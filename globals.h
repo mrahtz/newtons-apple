@@ -52,6 +52,7 @@ enum object_ctr
     LAST_MOVER,
     // after LAST_MOVER so it's not accessed during the normal
     // i < LAST_MOVER iterations
+    TREE,
     GROUND,
     OBJECTS_END
 };

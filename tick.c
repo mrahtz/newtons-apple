@@ -38,10 +38,13 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
     case INIT_INTRO:
         objects[APPLE].reset_x_vel = 0;
         reset_objects(objects);
+        objects[TREE].x_pos = -30;
+        objects[TREE].y_pos = objects[GROUND].y_pos - objects[TREE].height;
+        game_state->ticks = 0;
         game_state->scene = INTRO;
         // drop through
     case INTRO:
-        finished = show_intro(objects, display, intro_resources->tree, intro_resources->font);
+        finished = show_intro(objects, display, intro_resources->font, game_state->ticks);
         if (finished == 1)
             game_state->scene = INSTRUCTIONS;
         break;
