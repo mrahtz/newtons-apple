@@ -46,7 +46,8 @@ void tick(game_state_struct *game_state,
         game_state->scene_timer = 0;
         // drop through
     case INTRO:
-        finished = show_intro(objects, display, intro_resources->font, game_state);
+        finished = show_intro(objects, display, intro_resources->font,
+                              game_state->scene_timer, &(game_state->anim_state));
         if (finished == 1)
             game_state->scene = INIT_INSTRUCTIONS;
         break;

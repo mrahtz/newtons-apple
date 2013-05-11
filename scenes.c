@@ -36,7 +36,7 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton, int scene_timer)
 
 extern const float G;   // was defined in game.c
 int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
-        game_state_struct *game_state)
+        int scene_timer, animation_state_struct *anim_state)
 {
     enum times {
         LABEL_VANISH_T = 100,
@@ -46,7 +46,6 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
         PUZZLE_END_T = PUZZLE_START_T + 60,
         CAMERA_MOVE_T = PUZZLE_END_T + 60
     };
-    int t = game_state->scene_timer;
 
     const int APPLE_OFFSET_X = 100;
     const int APPLE_OFFSET_Y = 120;
@@ -68,17 +67,17 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
 
     // step 1: figure out what the apple's doing
     {
-        if (t == 0) {
+        if (scene_timer == 0) {
             object *a = &objects[APPLE];
             a->x_vel = a->y_vel = a->x_acc = a->y_acc = 0;
             objects[APPLE].x_pos = APPLE_OFFSET_X;
             objects[APPLE].y_pos = APPLE_OFFSET_Y;
-        } if (t == DROP_T) {
+        } if (scene_timer == DROP_T) {
             objects[APPLE].x_acc = 0;
             objects[APPLE].y_acc = 0.1;
             objects[APPLE].x_vel = 0;
             objects[APPLE].y_vel = 0;
-        } else if (t == GUST_T) {
+        } else if (scene_timer == GUST_T) {
             objects[APPLE].y_acc = -0.2;
             objects[APPLE].x_acc = 0.3;
         }
@@ -95,7 +94,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
 
     // step 2: figure out what the camera should be doing
     {
-        if (t == CAMERA_MOVE_T)
+        if (scene_timer == CAMERA_MOVE_T)
             newton->x_vel = CAMERA_INIT_VEL;
         // if before newton catching up to apple, accelerate
         if (newton->x_vel > 0 && apple_is_offscreen)
@@ -122,14 +121,14 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
 
     // step 4: draw the scene
     {
-        if (t >= CAMERA_MOVE_T) {
+        if (scene_timer >= CAMERA_MOVE_T) {
             // running!
-            game_state->anim_state.velocity = newton->x_vel;
-            draw_objects_with_animate(objects, &(game_state->anim_state));
+            anim_state->velocity = newton->x_vel;
+            draw_objects_with_animate(objects, anim_state);
         } else {
             draw_object_sprite_n(&objects[GROUND], 1);
             draw_object_sprite_n(&objects[APPLE], 1);
-            if (t > GUST_T) // awake!
+            if (scene_timer > GUST_T) // awake!
                 draw_object_sprite_n(newton, 1);
             else    // still asleep
                 draw_object_sprite_n(newton, 3);
@@ -137,13 +136,13 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
 
         draw_object_sprite_n(tree, 1);
 
-        if (t <= LABEL_VANISH_T) {
+        if (scene_timer <= LABEL_VANISH_T) {
             al_draw_text(font, al_map_rgb(255,255,255),
                          newton_label_x, newton_label_y,
                          ALLEGRO_ALIGN_LEFT,
                          "Isaac Newton");
         }
-        if (t >= PUZZLE_START_T && t <= PUZZLE_END_T) {
+        if (scene_timer >= PUZZLE_START_T && scene_timer <= PUZZLE_END_T) {
             al_draw_text(font, al_map_rgb(255,255,255),
                          puzzle_label_x, puzzle_label_y,
                          ALLEGRO_ALIGN_LEFT,
