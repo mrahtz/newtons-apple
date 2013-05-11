@@ -16,7 +16,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
 			   int scene_timer, animation_state_struct *anim_state);
 int show_instructions(object *objects, ALLEGRO_DISPLAY *display,
                       ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2,
-                      game_state_struct *game_state);
+                      int scene_timer, animation_state_struct *anim_state);
 int game_tick(object *objects, float audio_level, int *lives, int *score);
 void show_gameover(int score, ALLEGRO_FONT *font);
 

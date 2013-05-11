@@ -59,7 +59,7 @@ void tick(game_state_struct *game_state,
     case INSTRUCTIONS:
         cycle_finished = show_instructions(objects, display,
             intro_resources->instructions1, intro_resources->instructions2,
-            game_state);
+            game_state->scene_timer, &(game_state->anim_state));
         if (cycle_finished)
             intro_resources->times_blown++;
         if (intro_resources->times_blown == 3) {
