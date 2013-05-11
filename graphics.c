@@ -37,31 +37,25 @@ void rotate_ground(object *ground, ALLEGRO_DISPLAY *display, int amount)
     al_set_target_backbuffer(display);
 }
 
-void draw_objects_with_animate(object *objects, int velocity, int ticks)
+void draw_objects_with_animate(object *objects, animation_state_struct *state)
 {
-    static int last_switch = 0;
-    static int sprite_n = 1;
-
     enum object_ctr i;
-
     int animate_time;
-    if (velocity == 0)
+
+    if (state->velocity == 0)
         animate_time = 0;
     else
-        animate_time = (int) 300/velocity;
-    if (animate_time != 0 &&    // 0 -> don't animate
-            ticks - last_switch >= animate_time) {
-        last_switch = ticks;
+        animate_time = (int) 300/state->velocity;
 
-        if (sprite_n == 1)
-            sprite_n = 2;
-        else
-            sprite_n = 1;
+    if (animate_time != 0 &&    // 0 -> don't animate
+        state->frame_n - state->last_frame_n >= animate_time) {
+            state->last_frame_n = state->frame_n;
+            state->sprite_n = (state->sprite_n == 1 ? 2 : 1);
     }
 
     for (i = 0; i < LAST_MOVER; i++) {
         if (! objects[i].destroyed)
-            draw_object_sprite_n(&objects[i], sprite_n);
+            draw_object_sprite_n(&objects[i], state->sprite_n);
     }
     draw_object_sprite_n(&objects[GROUND], 1);
 }
@@ -92,14 +86,14 @@ int check_if_offscreen(object *o)
 // al_draw_bitmap doesn't take consts so can't const their parameters :(
 void draw_game(object *objects,
                ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
-               const game_state_struct *game_state)
+               game_state_struct *game_state)
 {
     char lives_str[20], score_str[20];
     int font_line_height = al_get_font_line_height(font);
 
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
     // second arg animate interval - faster as apple goes faster
-    draw_objects_with_animate(objects, objects[APPLE].x_vel, game_state->ticks);
+    draw_objects_with_animate(objects, &(game_state->anim_state));
     sprintf(score_str, "Score: %d", game_state->score);
     al_draw_text(font, al_map_rgb(255,255,255),
                  10, 10,

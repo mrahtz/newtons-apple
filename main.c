@@ -103,7 +103,10 @@ int main(void)
         load_resources(&font, &intro_resources, objects);
 
         game_state.scene = INIT_TITLE;
-        game_state.ticks = 0;
+        game_state.anim_state.last_frame_n = 0;
+        game_state.anim_state.frame_n = 0;
+        game_state.anim_state.sprite_n = 1;
+        game_state.anim_state.velocity = 0;
     }
 
     // game loop

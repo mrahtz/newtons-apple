@@ -1,6 +1,6 @@
 #include "scenes.h"
 
-void show_titlescreen(ALLEGRO_FONT *font, object *newton, int ticks)
+void show_titlescreen(ALLEGRO_FONT *font, object *newton, int scene_timer)
 {
     const int min_x = CANVAS_WIDTH * 1.0/4;
     const int max_x = CANVAS_WIDTH * 3.0/4;
@@ -15,7 +15,7 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton, int ticks)
 
     // x % 10 ranges from 0 to 9
     // half is from 0 to 4, other half from 5 to 9
-    if (ticks % 10 <= 4)
+    if (scene_timer % 10 <= 4)
         sprite = newton->sprite1;
     else
         sprite = newton->sprite2;
@@ -35,7 +35,8 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton, int ticks)
 }
 
 extern const float G;   // was defined in game.c
-int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, int ticks)
+int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
+        game_state_struct *game_state)
 {
     enum times {
         LABEL_VANISH_T = 100,
@@ -45,6 +46,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
         PUZZLE_END_T = PUZZLE_START_T + 60,
         CAMERA_MOVE_T = PUZZLE_END_T + 60
     };
+    int t = game_state->scene_timer;
 
     const int APPLE_OFFSET_X = 100;
     const int APPLE_OFFSET_Y = 120;
@@ -66,17 +68,17 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
 
     // step 1: figure out what the apple's doing
     {
-        if (ticks == 0) {
+        if (t == 0) {
             object *a = &objects[APPLE];
             a->x_vel = a->y_vel = a->x_acc = a->y_acc = 0;
             objects[APPLE].x_pos = APPLE_OFFSET_X;
             objects[APPLE].y_pos = APPLE_OFFSET_Y;
-        } if (ticks == DROP_T) {
+        } if (t == DROP_T) {
             objects[APPLE].x_acc = 0;
             objects[APPLE].y_acc = 0.1;
             objects[APPLE].x_vel = 0;
             objects[APPLE].y_vel = 0;
-        } else if (ticks == GUST_T) {
+        } else if (t == GUST_T) {
             objects[APPLE].y_acc = -0.2;
             objects[APPLE].x_acc = 0.3;
         }
@@ -93,7 +95,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
 
     // step 2: figure out what the camera should be doing
     {
-        if (ticks == CAMERA_MOVE_T)
+        if (t == CAMERA_MOVE_T)
             newton->x_vel = CAMERA_INIT_VEL;
         // if before newton catching up to apple, accelerate
         if (newton->x_vel > 0 && apple_is_offscreen)
@@ -120,12 +122,14 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
 
     // step 4: draw the scene
     {
-        if (ticks >= CAMERA_MOVE_T)
-            draw_objects_with_animate(objects, newton->x_vel, ticks); // running!
-        else {
+        if (t >= CAMERA_MOVE_T) {
+            // running!
+            game_state->anim_state.velocity = newton->x_vel;
+            draw_objects_with_animate(objects, &(game_state->anim_state));
+        } else {
             draw_object_sprite_n(&objects[GROUND], 1);
             draw_object_sprite_n(&objects[APPLE], 1);
-            if (ticks > GUST_T) // awake!
+            if (t > GUST_T) // awake!
                 draw_object_sprite_n(newton, 1);
             else    // still asleep
                 draw_object_sprite_n(newton, 3);
@@ -133,13 +137,13 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
 
         draw_object_sprite_n(tree, 1);
 
-        if (ticks <= LABEL_VANISH_T) {
+        if (t <= LABEL_VANISH_T) {
             al_draw_text(font, al_map_rgb(255,255,255),
                          newton_label_x, newton_label_y,
                          ALLEGRO_ALIGN_LEFT,
                          "Isaac Newton");
         }
-        if (ticks >= PUZZLE_START_T && ticks <= PUZZLE_END_T) {
+        if (t >= PUZZLE_START_T && t <= PUZZLE_END_T) {
             al_draw_text(font, al_map_rgb(255,255,255),
                          puzzle_label_x, puzzle_label_y,
                          ALLEGRO_ALIGN_LEFT,
@@ -156,21 +160,24 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
 }
 
 extern const float G;   // defined in physics.c
-int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2, int ticks)
+int show_instructions(object *objects, ALLEGRO_DISPLAY *display,
+                      ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2,
+                      game_state_struct *game_state)
 {
     ALLEGRO_BITMAP *instructions = instructions1; // by default
     int cycle_finished = 0;
+    int t = game_state->scene_timer;
 
     const int PAUSE_T = 60;
 
-    if (ticks == PAUSE_T)
+    if (t == PAUSE_T)
         objects[APPLE].y_acc = G;
 
-    if (ticks >= PAUSE_T &&
+    if (t >= PAUSE_T &&
             objects[APPLE].y_pos > CANVAS_HEIGHT * 0.4) {   // too low!
         objects[APPLE].y_acc = -G;    // bloooow!
         instructions = instructions2;
-    } else if (ticks >= PAUSE_T &&
+    } else if (t >= PAUSE_T &&
             objects[APPLE].y_pos < CANVAS_HEIGHT * 0.4) {  // high enough, stop blowing
         if (objects[APPLE].y_acc != G) // we've just switched
             cycle_finished = 1;
@@ -180,8 +187,9 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
 
     update_physics(objects, APPLE, MODE_WRT_APPLE);
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
-    draw_objects_with_animate(objects, objects[APPLE].x_vel, ticks);    // second arg animate interval - faster as apple goes faster
-    if (ticks > PAUSE_T)
+    game_state->anim_state.velocity = objects[APPLE].x_vel;
+    draw_objects_with_animate(objects, &(game_state->anim_state));
+    if (t > PAUSE_T)
         al_draw_bitmap(instructions, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
 
     return cycle_finished;

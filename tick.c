@@ -16,7 +16,8 @@ void handle_click(int *scene)
     }
 }
 
-void tick(game_state_struct *game_state, float audio_level, object *objects,
+void tick(game_state_struct *game_state, 
+        float audio_level, object *objects,
         ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, intro_resource_struct *intro_resources)
 {
     int finished, gameover, cycle_finished;
@@ -30,9 +31,10 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
         objects[NEWTON].y_pos = CANVAS_HEIGHT * 2.0/3;
         objects[NEWTON].x_vel = 2;
         game_state->scene = TITLE;
+        game_state->scene_timer = 0;
         // drop through
     case TITLE:
-        show_titlescreen(font, &objects[NEWTON], game_state->ticks);
+        show_titlescreen(font, &objects[NEWTON], game_state->scene_timer);
         break;
 
     case INIT_INTRO:
@@ -40,23 +42,23 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
         reset_objects(objects);
         objects[TREE].x_pos = -30;
         objects[TREE].y_pos = objects[GROUND].y_pos - objects[TREE].height;
-        game_state->ticks = 0;
         game_state->scene = INTRO;
+        game_state->scene_timer = 0;
         // drop through
     case INTRO:
-        finished = show_intro(objects, display, intro_resources->font, game_state->ticks);
+        finished = show_intro(objects, display, intro_resources->font, game_state);
         if (finished == 1)
             game_state->scene = INIT_INSTRUCTIONS;
         break;
 
     case INIT_INSTRUCTIONS:
-        game_state->ticks = 0;
         game_state->scene = INSTRUCTIONS;
+        game_state->scene_timer = 0;
         intro_resources->times_blown = 0;
     case INSTRUCTIONS:
         cycle_finished = show_instructions(objects, display,
             intro_resources->instructions1, intro_resources->instructions2,
-            game_state->ticks);
+            game_state);
         if (cycle_finished)
             intro_resources->times_blown++;
         if (intro_resources->times_blown == 3) {
@@ -85,5 +87,6 @@ void tick(game_state_struct *game_state, float audio_level, object *objects,
     }
 
     al_flip_display();
-    game_state->ticks++;
+    game_state->scene_timer++;
+    game_state->anim_state.frame_n++;
 }

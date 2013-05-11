@@ -83,10 +83,21 @@ typedef struct
 
 typedef struct
 {
+    int frame_n;
+    int last_frame_n;
+    int sprite_n;
+    // animate faster the faster the reference object is going
+    // (for intro, Newton, for game, apple)
+    float velocity;
+} animation_state_struct;
+
+typedef struct
+{
     int scene;
+    int scene_timer;
     int score;
     int lives; 
-    int ticks;
+    animation_state_struct anim_state;
 } game_state_struct;
 
 #endif
