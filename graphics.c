@@ -37,9 +37,8 @@ void rotate_ground(object *ground, ALLEGRO_DISPLAY *display, int amount)
     al_set_target_backbuffer(display);
 }
 
-void draw_objects_with_animate(object *objects, int velocity)
+void draw_objects_with_animate(object *objects, int velocity, int ticks)
 {
-    static int animate_timer = 0;
     static int last_switch = 0;
     static int sprite_n = 1;
 
@@ -51,8 +50,8 @@ void draw_objects_with_animate(object *objects, int velocity)
     else
         animate_time = (int) 300/velocity;
     if (animate_time != 0 &&    // 0 -> don't animate
-            animate_timer - last_switch >= animate_time) {
-        last_switch = animate_timer;
+            ticks - last_switch >= animate_time) {
+        last_switch = ticks;
 
         if (sprite_n == 1)
             sprite_n = 2;
@@ -65,8 +64,6 @@ void draw_objects_with_animate(object *objects, int velocity)
             draw_object_sprite_n(&objects[i], sprite_n);
     }
     draw_object_sprite_n(&objects[GROUND], 1);
-
-    animate_timer++;
 }
 
 void draw_object_sprite_n(object *o, int sprite_n)
@@ -95,20 +92,20 @@ int check_if_offscreen(object *o)
 // al_draw_bitmap doesn't take consts so can't const their parameters :(
 void draw_game(object *objects,
                ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
-               int score, int lives)
+               const game_state_struct *game_state)
 {
     char lives_str[20], score_str[20];
     int font_line_height = al_get_font_line_height(font);
 
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
     // second arg animate interval - faster as apple goes faster
-    draw_objects_with_animate(objects, objects[APPLE].x_vel);
-    sprintf(score_str, "Score: %d", score);
+    draw_objects_with_animate(objects, objects[APPLE].x_vel, game_state->ticks);
+    sprintf(score_str, "Score: %d", game_state->score);
     al_draw_text(font, al_map_rgb(255,255,255),
                  10, 10,
                  ALLEGRO_ALIGN_LEFT, score_str);
 
-    sprintf(lives_str, "Lives left: %d", lives);
+    sprintf(lives_str, "Lives left: %d", game_state->lives);
     al_draw_text(font, al_map_rgb(255,255,255),
                  10, 10+font_line_height,
                  ALLEGRO_ALIGN_LEFT, lives_str);

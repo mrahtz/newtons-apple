@@ -121,7 +121,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font, in
     // step 4: draw the scene
     {
         if (ticks >= CAMERA_MOVE_T)
-            draw_objects_with_animate(objects, newton->x_vel); // running!
+            draw_objects_with_animate(objects, newton->x_vel, ticks); // running!
         else {
             draw_object_sprite_n(&objects[GROUND], 1);
             draw_object_sprite_n(&objects[APPLE], 1);
@@ -180,7 +180,7 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP 
 
     update_physics(objects, APPLE, MODE_WRT_APPLE);
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
-    draw_objects_with_animate(objects, objects[APPLE].x_vel);    // second arg animate interval - faster as apple goes faster
+    draw_objects_with_animate(objects, objects[APPLE].x_vel, ticks);    // second arg animate interval - faster as apple goes faster
     if (ticks > PAUSE_T)
         al_draw_bitmap(instructions, CANVAS_WIDTH * 4/6.0, CANVAS_HEIGHT/4.0, 0);
 
