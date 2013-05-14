@@ -16,8 +16,6 @@ void load_respawn(object *o, int n, float multiplier)
             break;
     }
     o->respawn_timer *= multiplier;
-    if (multiplier != 1.0)
-        printf("respawn timer multiplier is %f\n", multiplier);
 }
 
 void reset_objects(object *objects)

@@ -54,9 +54,12 @@ int simulate_objects(object *objects, float audio_level)
               check_ground_collision(o, &objects[GROUND]) == 1)
                 && !o->destroyed ) {
             o->destroyed = 1;
-            // third arg is multiplier on respawn time - 
-            // decrease spawn interval as goes faster
-            load_respawn(o, i, 20/(objects[APPLE].x_vel));
+            if (i != APPLE) {
+                // third arg is multiplier on respawn time - 
+                // decrease spawn interval as goes faster
+                load_respawn(o, i, 20/(objects[APPLE].x_vel));
+            } else
+                load_respawn(o, i, 1.0);
         }
     }
     
