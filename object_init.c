@@ -2,7 +2,7 @@
 
 static void reset_object_position(object *objects, int object_n);
 
-void load_respawn(object *o, int n)
+void load_respawn(object *o, int n, float multiplier)
 {
     switch(n) {
         case APPLE:
@@ -15,6 +15,9 @@ void load_respawn(object *o, int n)
             o->respawn_timer = (int) BIRD_RESPAWN_INTERVAL * rand_between(1.0, 5.0);
             break;
     }
+    o->respawn_timer *= multiplier;
+    if (multiplier != 1.0)
+        printf("respawn timer multiplier is %f\n", multiplier);
 }
 
 void reset_objects(object *objects)
@@ -43,7 +46,8 @@ void reset_object_physics(object *objects, int object_n)
     switch (object_n) {
         case APPLE:
             o->x_vel = o->reset_x_vel;
-            o->x_acc = 0.01;
+            // speed up as game goes on
+            o->x_acc = 0.02;
             break;
 
         case PROJECTILE:

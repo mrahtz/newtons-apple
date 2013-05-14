@@ -88,10 +88,8 @@ void load_resources(ALLEGRO_FONT **font, intro_resource_struct *intro_resources,
     intro_resources->instructions2 = load_packed_bitmap(instructions2_png, instructions2_png_size);
 
     enum object_ctr i;
-    for (i = 0; i < LAST_MOVER; i++) {
+    for (i = 0; i < LAST_MOVER; i++)
         init_sprite(&objects[i], i);
-        load_respawn(&objects[i], i);
-    }
     // not handled above
     init_sprite(&objects[TREE], TREE);
     init_sprite(&objects[GROUND], GROUND);

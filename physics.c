@@ -46,22 +46,26 @@ int simulate_objects(object *objects, float audio_level)
                 objects[APPLE].invincibility_timer == 0 &&
                 check_collision(o, &objects[APPLE]) == 1) {
             objects[APPLE].destroyed = 1;
-            load_respawn(&objects[APPLE], APPLE);
-            load_respawn(o, i);
+            load_respawn(&objects[APPLE], APPLE, 1.0);
+            load_respawn(o, i, 20/(objects[APPLE].x_vel));
         }
 
         if ( (check_if_offscreen(o) == 1 ||
               check_ground_collision(o, &objects[GROUND]) == 1)
                 && !o->destroyed ) {
             o->destroyed = 1;
-            load_respawn(o, i);
+            // third arg is multiplier on respawn time - 
+            // decrease spawn interval as goes faster
+            load_respawn(o, i, 20/(objects[APPLE].x_vel));
         }
     }
     
     // apple has just been destroyed
-    if (objects[APPLE].respawn_timer == APPLE_RESPAWN_INTERVAL)
+    if (objects[APPLE].respawn_timer == APPLE_RESPAWN_INTERVAL) {
+        // don't reset velocity
+        objects[APPLE].reset_x_vel = objects[APPLE].x_vel;
         return 1;
-    else
+    } else
         return 0;
 }
 
