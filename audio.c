@@ -10,6 +10,50 @@ int check_pa_err(char *where, PaError err)
     return 0;
 }
 
+enum testmode_enum
+{
+    NOTEST,
+    SINUSOID_5KHZ,
+    SINUSOID_SPREAD,
+    MIN,
+    MAX,
+    ZERO
+};
+const enum testmode_enum testmode = MAX;
+
+void write_test_buffer(float *buffer, unsigned long framesPerBuffer)
+{
+    int i;
+    static float t = 0;
+    float multiplier;
+
+    for (i = 0; i < framesPerBuffer; i++) {
+        switch(testmode) {
+            case SINUSOID_5KHZ:
+                buffer[i] = sin(5000 * t);
+                break;
+            case SINUSOID_SPREAD:
+                // vary from 0 hz to 10 kHz over 10 seconds
+                // frequency is t (in seconds) kHz
+                multiplier = t/SAMPLERATE;
+                buffer[i] = sin(multiplier*1000 * t);
+                break;
+            case MIN:               // float from portaudio ranges from -1.0 ...
+                buffer[i] = -1.0;
+                break;
+            case MAX:
+                buffer[i] = +1.0;   // to +1.0
+                break;
+            case ZERO:
+                buffer[i] = 0;
+                break;
+            case NOTEST:    // just in case :)
+                break;
+        }
+        t += 1.0/SAMPLERATE;
+    }
+}
+
 // stores average amplitude of buffer in userData pointer
 int record_callback(const void *inputBuffer, void *outputBuffer,
                     unsigned long framesPerBuffer,
@@ -21,6 +65,9 @@ int record_callback(const void *inputBuffer, void *outputBuffer,
     float *in = (float *) inputBuffer;
     float *mean = (float *) userData;
     float sum = 0;
+
+    if (testmode != NOTEST)
+        write_test_buffer(in, framesPerBuffer);
 
     for (i = 0; i < framesPerBuffer; i++) {
         sum += fabs(in[0]);
@@ -42,7 +89,7 @@ PaStream * init_portaudio(float *userdata)
                                 1,          // 1 input channel
                                 0,          // no output channels
                                 paFloat32,  // sample format
-                                44100,      // sample rate
+                                SAMPLERATE,
                                 256,        // frames per buffer
                                 record_callback,
                                 userdata );
