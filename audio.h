@@ -6,14 +6,6 @@
 #include <stdio.h>
 #include "globals.h"
 
-#define SAMPLERATE 44100
-
-int check_pa_err(char *where, PaError err);
-int record_callback(const void *inputBuffer, void *outputBuffer,
-                    unsigned long framesPerBuffer,
-                    const PaStreamCallbackTimeInfo* timeInfo,
-                    PaStreamCallbackFlags statusFlags,
-                    void *userdata);
 PaStream * init_portaudio(float *userdata);
 void free_portaudio(PaStream *audio_stream);
 

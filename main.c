@@ -102,9 +102,10 @@ int main(void)
         audio_stream = init_portaudio(&audio_level);
         load_resources(&font, &intro_resources, objects);
 
-        //game_state.scene = INIT_TITLE;
-        game_state.scene = INIT_GAME_WITH_RESET;
-        objects[APPLE].reset_x_vel = 18;
+        game_state.scene = INIT_TITLE;
+        /* for quick testing of game loop */
+        /*game_state.scene = INIT_GAME_WITH_RESET;
+        objects[APPLE].reset_x_vel = 18;*/
         game_state.anim_state.last_frame_n = 0;
         game_state.anim_state.frame_n = 0;
         game_state.anim_state.sprite_n = 1;
