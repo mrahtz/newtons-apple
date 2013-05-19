@@ -8,28 +8,29 @@
 		<Build>
 			<Target title="Release">
 				<Option output="newtonsapple" prefix_auto="1" extension_auto="1" />
-				<Option type="0" />
+				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="M:\C\include\portaudio" />
-					<Add directory="M:\C\include\allegro" />
+					<Add directory="M:\newtonsapple\include\portaudio" />
+					<Add directory="M:\newtonsapple\include\allegro" />
 				</Compiler>
 				<Linker>
-					<Add library="M:\C\lib\liballegro_image-5.0.7-static-mt.a" />
-					<Add library="M:\C\lib\liballegro_ttf-5.0.7-static-mt.a" />
-					<Add library="M:\C\lib\liballegro-5.0.7-static-mt.a" />
-					<Add library="M:\C\lib\libportaudio.dll.a" />
-					<Add library="M:\C\lib\liballegro_font-5.0.7-static-mt.a" />
-					<Add library="M:\C\lib\libgdi32.a" />
-					<Add library="M:\C\lib\libgdiplus.a" />
-					<Add library="M:\C\lib\libopengl32.a" />
-					<Add library="M:\C\lib\libfreetype-2.4.8-static-mt.a" />
-					<Add library="M:\C\lib\libwinmm.a" />
-					<Add library="M:\C\lib\libuuid.a" />
-					<Add library="M:\C\lib\libole32.a" />
-					<Add library="M:\C\lib\libshlwapi.a" />
-					<Add library="M:\C\lib\libpsapi.a" />
+					<Add library="M:\newtonsapple\lib\liballegro_image-5.0.7-static-mt.a" />
+					<Add library="M:\newtonsapple\lib\liballegro_ttf-5.0.7-static-mt.a" />
+					<Add library="M:\newtonsapple\lib\liballegro-5.0.7-static-mt.a" />
+					<Add library="M:\newtonsapple\lib\liballegro_font-5.0.7-static-mt.a" />
+					<Add library="M:\newtonsapple\lib\liballegro_memfile-5.0.7-static-mt.a" />
+					<Add library="M:\newtonsapple\lib\libportaudio.a" />
+					<Add library="M:\newtonsapple\lib\libgdi32.a" />
+					<Add library="M:\newtonsapple\lib\libgdiplus.a" />
+					<Add library="M:\newtonsapple\lib\libopengl32.a" />
+					<Add library="M:\newtonsapple\lib\libfreetype-2.4.8-static-mt.a" />
+					<Add library="M:\newtonsapple\lib\libwinmm.a" />
+					<Add library="M:\newtonsapple\lib\libuuid.a" />
+					<Add library="M:\newtonsapple\lib\libole32.a" />
+					<Add library="M:\newtonsapple\lib\libshlwapi.a" />
+					<Add library="M:\newtonsapple\lib\libpsapi.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -48,6 +49,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="object_init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="object_init.h" />
 		<Unit filename="physics.c">
 			<Option compilerVar="CC" />
 		</Unit>
