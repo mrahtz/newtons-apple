@@ -5,7 +5,6 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 
-// TODO justify use of enums rather than defines
 enum game_states
 {
     INIT_TITLE,
@@ -33,7 +32,7 @@ enum
     APPLE_INVINCIBILITY_TIME = 240,
     PROJECTILE_RESPAWN_INTERVAL = 60,
     BIRD_RESPAWN_INTERVAL = 110,
-    INIT_APPLE_X = CANVAS_WIDTH/2,      // so that the intro sequence can check
+    INIT_APPLE_X = CANVAS_WIDTH/2,      /* so that the intro sequence can check */
     INIT_APPLE_Y = CANVAS_HEIGHT/4,
     MIC_SENSITIVITY = 5
 };
@@ -51,8 +50,8 @@ enum object_ctr
     BIRD,
     NEWTON,
     LAST_MOVER,
-    // after LAST_MOVER so it's not accessed during the normal
-    // i < LAST_MOVER iterations
+    /* after LAST_MOVER so it's not accessed during the normal
+       i < LAST_MOVER iterations */
     TREE,
     GROUND,
     OBJECTS_END
@@ -62,22 +61,22 @@ typedef struct
 {
     ALLEGRO_BITMAP *sprite1;
     ALLEGRO_BITMAP *sprite2;
-    ALLEGRO_BITMAP *sprite3;    // only used for Newton asleep
-    float x_acc, y_acc; // acceleration
-    float x_vel, y_vel; // velocity
-    float reset_x_vel;    // only used for apple - save vel after instructions finished
-    float x_pos, y_pos; // position
+    ALLEGRO_BITMAP *sprite3;    /* only used for Newton asleep */
+    float x_acc, y_acc;         /* acceleration */
+    float x_vel, y_vel;         /* velocity */
+    float reset_x_vel;          /* only used for apple - save vel after instructions finished */
+    float x_pos, y_pos;         /* position */
     int width, height;
-    int destroyed;      // whether the object should be drawn
-    int respawn_timer;          // time since object destroyed (0 = don't count)
-    int invincibility_timer;    // only used for apple
+    int destroyed;              /* whether the object should be drawn */
+    int respawn_timer;          /* time since object destroyed (0 = don't count) */
+    int invincibility_timer;    /* only used for apple */
 } object;
 
 typedef struct
 {
     ALLEGRO_BITMAP *instructions1;
     ALLEGRO_BITMAP *instructions2;
-    ALLEGRO_FONT *font; // small font for showing labels on Newton
+    ALLEGRO_FONT *font;         /* small font for showing labels on Newton */
     int times_blown;
 } intro_resource_struct;
 
@@ -86,8 +85,8 @@ typedef struct
     int frame_n;
     int last_frame_n;
     int sprite_n;
-    // animate faster the faster the reference object is going
-    // (for intro, Newton, for game, apple)
+    /* animate faster the faster the reference object is going
+       (for intro, Newton, for game, apple) */
     float velocity;
 } animation_state_struct;
 

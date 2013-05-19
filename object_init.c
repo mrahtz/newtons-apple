@@ -27,13 +27,13 @@ void reset_objects(object *objects)
         objects[i].invincibility_timer = 0;
         reset_object_physics(objects, i);
     }
-    // initially just the ground, newton and apple visible on screen
+    /* initially just the ground, newton and apple visible on screen */
     objects[GROUND].destroyed = 0;
     objects[APPLE].destroyed = 0;
     objects[NEWTON].destroyed = 0;
 }
 
-extern const float G;   // declared in physics.c
+extern const float G;   /* declared in physics.c */
 void reset_object_physics(object *objects, int object_n)
 {
     reset_object_position(objects, object_n);
@@ -44,15 +44,15 @@ void reset_object_physics(object *objects, int object_n)
     switch (object_n) {
         case APPLE:
             o->x_vel = o->reset_x_vel;
-            // speed up as game goes on
+            /* speed up as game goes on */
             o->x_acc = 0.02;
             break;
 
         case PROJECTILE:
             o->y_vel = -3;
-            // must go to right: +ve y velocity
+            /* must go to right: +ve y velocity */
             o->x_vel = rand_between(MIN_PROJ_VEL, MAX_PROJ_VEL);
-            // must go up: -ve y velocity
+            /* must go up: -ve y velocity */
             o->y_vel = -rand_between(MIN_PROJ_VEL, MAX_PROJ_VEL);
             o->x_acc = 0; o->y_acc = G;
             break;
@@ -62,7 +62,7 @@ void reset_object_physics(object *objects, int object_n)
             break;
 
         case NEWTON:
-            break;      // Newton stays still, nothing to do :)
+            break;      /* Newton stays still, nothing to do :) */
     }
 }
 

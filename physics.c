@@ -2,7 +2,7 @@
 
 const float G = 0.1;
 
-// returns 1 if apple was hit, otherwise 0
+/* returns 1 if apple was hit, otherwise 0 */
 int simulate_objects(object *objects, float audio_level)
 {
     enum object_ctr i;
@@ -10,13 +10,13 @@ int simulate_objects(object *objects, float audio_level)
     if (objects[APPLE].invincibility_timer != 0)
         objects[APPLE].invincibility_timer--;
 
-    // handle respawn timing
+    /* handle respawn timing */
     for (i = 0; i < LAST_MOVER; i++) {
         object *o = &objects[i];
 
         if  (o->respawn_timer != 0)
             o->respawn_timer--;
-        else if (o->destroyed && o->respawn_timer == 0) {   // time to respawn
+        else if (o->destroyed && o->respawn_timer == 0) {   /* time to respawn */
             o->respawn_timer = 0;
             o->destroyed = 0;
             if (i == APPLE)
@@ -35,9 +35,9 @@ int simulate_objects(object *objects, float audio_level)
             o->y_acc = G - MIC_SENSITIVITY*audio_level;
 
         update_physics(objects, i, MODE_WRT_APPLE);
-        //printf("%f %f\n", o->x_pos, o->y_pos);
+        /*printf("%f %f\n", o->x_pos, o->y_pos);*/
         if (i == APPLE && o->y_pos < 0) {
-            o->y_pos = 0; // cap the apple to the top of the screen
+            o->y_pos = 0; /* cap the apple to the top of the screen */
             o->y_vel = 0;
         }
 
@@ -55,17 +55,17 @@ int simulate_objects(object *objects, float audio_level)
                 && !o->destroyed ) {
             o->destroyed = 1;
             if (i != APPLE) {
-                // third arg is multiplier on respawn time - 
-                // decrease spawn interval as goes faster
+                /* third arg is multiplier on respawn time -
+                   decrease spawn interval as goes faster */
                 load_respawn(o, i, 20/(objects[APPLE].x_vel));
             } else
                 load_respawn(o, i, 1.0);
         }
     }
     
-    // apple has just been destroyed
+    /* apple has just been destroyed */
     if (objects[APPLE].respawn_timer == APPLE_RESPAWN_INTERVAL) {
-        // don't reset velocity
+        /* don't reset velocity */
         objects[APPLE].reset_x_vel = objects[APPLE].x_vel;
         return 1;
     } else
@@ -74,23 +74,23 @@ int simulate_objects(object *objects, float audio_level)
 
 int check_collision(object *o1, object *o2)
 {
-    // half-dimensions of object 1
+    /* half-dimensions of object 1 */
     int o1_hwidth = al_get_bitmap_width(o1->sprite1)/2;
     int o1_hheight = al_get_bitmap_height(o1->sprite1)/2;
-    // half-dimensions of object 2
+    /* half-dimensions of object 2 */
     int o2_hwidth = al_get_bitmap_width(o2->sprite1)/2;
     int o2_hheight = al_get_bitmap_height(o2->sprite1)/2;
 
-    // centre of object 1
+    /* centre of object 1 */
     int o1_centre_x = o1->x_pos + o1_hwidth;
     int o1_centre_y = o1->y_pos + o1_hheight;
-    // centre of object 2
+    /* centre of object 2 */
     int o2_centre_x = o2->x_pos + o2_hwidth;
     int o2_centre_y = o2->y_pos + o2_hheight;
 
-    // if the distance between the centres is less than
-    // the sum of the half-distances in both dimensions,
-    // they're colliding
+    /* if the distance between the centres is less than
+       the sum of the half-distances in both dimensions,
+       they're colliding */
     if ( abs(o2_centre_x - o1_centre_x) < (o2_hwidth + o1_hwidth) &&
          abs(o2_centre_y - o1_centre_y) < (o2_hheight + o1_hheight) )
         return 1;

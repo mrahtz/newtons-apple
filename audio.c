@@ -3,8 +3,8 @@
 static int check_pa_err(char *where, PaError err)
 {
     if (err != paNoError) {
-        fprintf(stderr, "audio error at %s: %s\n", where, Pa_GetErrorText(err)); // TODO better errors
-        //exit(1);
+        fprintf(stderr, "audio error at %s: %s\n", where, Pa_GetErrorText(err));
+        exit(1);
         return 1;
     }
     return 0;
@@ -35,29 +35,29 @@ static void write_test_buffer(float *buffer, unsigned long framesPerBuffer, floa
                 buffer[i] = 0.04*sin((1.0/8)*2*pi*t);
                 break;
             case SINUSOID_SPREAD:
-                // vary from 0 hz to 10 kHz over 10 seconds
-                /* can't actually do mod because of floats */
+                /* vary from 0 hz to 10 kHz over 10 seconds
+                   can't actually do mod because of floats */
                 t_mod_10 = t - 10*floor(t/10);
                 /* ranges from 1 Hz to ~ 9 kHz */
                 multiplier = pow(2.5, t_mod_10);
                 buffer[i] = 0.031*sin(multiplier*2*pi*t);
                 break;
-            case MIN:               // float from portaudio ranges from -1.0 ...
+            case MIN:               /* float from portaudio ranges from -1.0 ... */
                 buffer[i] = -1.0;
                 break;
             case MAX:
-                buffer[i] = +1.0;   // to +1.0
+                buffer[i] = +1.0;   /* to +1.0 */
                 break;
             case ZERO:
                 buffer[i] = 0;
                 break;
-            case NOTEST:    // just in case :)
+            case NOTEST:            /* just in case :) */
                 break;
         }
     }
 }
 
-// stores average amplitude of buffer in userData pointer
+/* stores average amplitude of buffer in userData pointer */
 static int record_callback(const void *inputBuffer, void *outputBuffer,
                     unsigned long framesPerBuffer,
                     const PaStreamCallbackTimeInfo* timeInfo,
@@ -70,7 +70,7 @@ static int record_callback(const void *inputBuffer, void *outputBuffer,
     float sum = 0;
 
     if (TESTMODE != NOTEST) {
-        // currentTime is a double typedef'd to a PaTime
+        /* currentTime is a double typedef'd to a PaTime */
         write_test_buffer(in, framesPerBuffer,
                           (float) timeInfo->currentTime); 
     }
@@ -92,11 +92,11 @@ PaStream * init_portaudio(float *userdata)
     if (check_pa_err("init", err))
         return NULL;
     err = Pa_OpenDefaultStream( &stream,
-                                1,          // 1 input channel
-                                0,          // no output channels
-                                paFloat32,  // sample format
-                                44100,      // sample rate
-                                256,        // frames per buffer
+                                1,          /* 1 input channel */
+                                0,          /* no output channels */
+                                paFloat32,  /* sample format */
+                                44100,      /* sample rate */
+                                256,        /* frames per buffer */
                                 record_callback,
                                 userdata );
     if (check_pa_err("stream open", err))
@@ -110,7 +110,6 @@ PaStream * init_portaudio(float *userdata)
 
 void free_portaudio(PaStream *audio_stream)
 {
-    // TODO check for error?
     Pa_StopStream(audio_stream);
     Pa_Terminate();
 }

@@ -7,25 +7,25 @@ void rotate_ground(object *ground, ALLEGRO_DISPLAY *display, int amount)
     ALLEGRO_BITMAP *bm = ground->sprite1;
     ALLEGRO_COLOR *saved;
 
-    // if rotating more than the width,
-    // only rotate the different between the amount and the width
+    /* if rotating more than the width,
+       only rotate the different between the amount and the width */
     amount %= width+1;
 
     al_lock_bitmap(bm,
-                   ALLEGRO_PIXEL_FORMAT_ANY,    // pixel format
-                   ALLEGRO_LOCK_READWRITE);     // mode
+                   ALLEGRO_PIXEL_FORMAT_ANY,    /* pixel format */
+                   ALLEGRO_LOCK_READWRITE);     /* mode */
     al_set_target_bitmap(bm);
     saved = malloc(sizeof(ALLEGRO_COLOR) * amount);
 
     int y, x;
     for (y = 0; y < height; y++) {
-        // save the pixels on the left, to rotate round later
+        /* save the pixels on the left, to rotate round later */
         for (x = 0; x < amount; x++)
             saved[x] = al_get_pixel(bm, x, y);
-        // shift pixels to the left
+        /* shift pixels to the left */
         for (x = 0; x < width-amount; x++)
             al_put_pixel(x, y, al_get_pixel(bm, x+amount, y));
-        // stick the saved first pixel back on the end
+        /* stick the saved first pixel back on the end */
         for (x = width-amount; x < width; x++)
             al_put_pixel(x, y, saved[x-(width-amount)]);
     }
@@ -47,7 +47,7 @@ void draw_objects_with_animate(object *objects, animation_state_struct *state)
     else
         animate_time = (int) 300/state->velocity;
 
-    if (animate_time != 0 &&    // 0 -> don't animate
+    if (animate_time != 0 &&    /* 0 -> don't animate */
         state->frame_n - state->last_frame_n >= animate_time) {
             state->last_frame_n = state->frame_n;
             state->sprite_n = (state->sprite_n == 1 ? 2 : 1);
@@ -83,7 +83,7 @@ int check_if_offscreen(object *o)
     return offscreen_x || offscreen_y;
 }
 
-// al_draw_bitmap doesn't take consts so can't const their parameters :(
+/* al_draw_bitmap doesn't take consts so can't const their parameters :( */
 void draw_game(object *objects,
                ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
                game_state_struct *game_state)
@@ -92,7 +92,7 @@ void draw_game(object *objects,
     int font_line_height = al_get_font_line_height(font);
 
     rotate_ground(&objects[GROUND], display, objects[APPLE].x_vel);
-    // second arg animate interval - faster as apple goes faster
+    /* second arg animate interval - faster as apple goes faster */
     draw_objects_with_animate(objects, &(game_state->anim_state));
     sprintf(score_str, "Score: %d", game_state->score);
     al_draw_text(font, al_map_rgb(255,255,255),

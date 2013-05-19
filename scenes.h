@@ -4,7 +4,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
-#include <math.h>	// for pow() in show_intro
+#include <math.h>	/* for pow() in show_intro */
 #include "globals.h"
 #include "graphics.h"
 #include "physics.h"

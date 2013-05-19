@@ -9,7 +9,7 @@ void handle_click(int *scene)
         al_get_mouse_state(&m_state);
         int x = m_state.x;
 
-        if (x < CANVAS_WIDTH/2.0) // play again, reset
+        if (x < CANVAS_WIDTH/2.0) /* play again, reset */
             *scene = INIT_GAME_WITH_RESET;
         else
             *scene = QUIT;
@@ -26,13 +26,13 @@ void tick(game_state_struct *game_state,
 
     switch (game_state->scene) {
     case INIT_TITLE:
-        // Newton's state for the title screen
+        /* Newton's state for the title screen */
         objects[NEWTON].x_pos = CANVAS_WIDTH * 1.0/4;
         objects[NEWTON].y_pos = CANVAS_HEIGHT * 2.0/3;
         objects[NEWTON].x_vel = 2;
         game_state->scene = TITLE;
         game_state->scene_timer = 0;
-        // drop through
+        /* drop through */
     case TITLE:
         show_titlescreen(font, &objects[NEWTON], game_state->scene_timer);
         break;
@@ -44,7 +44,7 @@ void tick(game_state_struct *game_state,
         objects[TREE].y_pos = objects[GROUND].y_pos - objects[TREE].height;
         game_state->scene = INTRO;
         game_state->scene_timer = 0;
-        // drop through
+        /* drop through */
     case INTRO:
         finished = show_intro(objects, display, intro_resources->font,
                               game_state->scene_timer, &(game_state->anim_state));
@@ -63,13 +63,13 @@ void tick(game_state_struct *game_state,
         if (cycle_finished)
             intro_resources->times_blown++;
         if (intro_resources->times_blown == 3) {
-            // reset to current velocity when apple is destroyed
+            /* reset to current velocity when apple is destroyed */
             objects[APPLE].reset_x_vel = objects[APPLE].x_vel;
             game_state->scene = INIT_GAME;
         }
         break;
 
-    // note fallthrough!
+    /* note fallthrough! */
     case INIT_GAME_WITH_RESET:
         reset_objects(objects);
     case INIT_GAME:

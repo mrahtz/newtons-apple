@@ -13,8 +13,8 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton, int scene_timer)
 
     newton->x_pos += newton->x_vel;
 
-    // x % 10 ranges from 0 to 9
-    // half is from 0 to 4, other half from 5 to 9
+    /* x % 10 ranges from 0 to 9 
+       half is from 0 to 4, other half from 5 to 9 */
     if (scene_timer % 10 <= 4)
         sprite = newton->sprite1;
     else
@@ -31,10 +31,10 @@ void show_titlescreen(ALLEGRO_FONT *font, object *newton, int scene_timer)
 
     al_draw_bitmap(sprite,
                    newton->x_pos, newton->y_pos,
-                   newton->x_vel < 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);   // flags
+                   newton->x_vel < 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);   /* flags */
 }
 
-extern const float G;   // was defined in game.c
+extern const float G;   /* was defined in game.c */
 int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
         int scene_timer, animation_state_struct *anim_state)
 {
@@ -55,7 +55,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
     object *tree = &objects[TREE];
     const int CAMERA_INIT_VEL = 5;
     const float CAMERA_SPEEDUP_K = 1.01;
-    const float CAMERA_SLOWDOWN_K = 0.13; // derived experimentally :(
+    const float CAMERA_SLOWDOWN_K = 0.13; /* derived experimentally :( */
 
     int newton_label_x = objects[NEWTON].x_pos;
     int newton_label_y = objects[NEWTON].y_pos +
@@ -65,7 +65,7 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
     int puzzle_label_y = objects[NEWTON].y_pos + 10;
 
 
-    // step 1: figure out what the apple's doing
+    /* step 1: figure out what the apple's doing */
     {
         if (scene_timer == 0) {
             object *a = &objects[APPLE];
@@ -84,34 +84,34 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
         apple_is_offscreen = (check_if_offscreen(&objects[APPLE]) == 1);
         apple_is_onscreen = !apple_is_offscreen;
         if (apple_is_offscreen) {
-            objects[APPLE].y_pos = INIT_APPLE_Y;       // in the right place when the game starts
+            objects[APPLE].y_pos = INIT_APPLE_Y;       /* in the right place when the game starts */
             objects[APPLE].y_vel = 0;
             objects[APPLE].y_acc = 0;
-            // x_vel stays the same after the gust
+            /* x_vel stays the same after the gust */
             objects[APPLE].x_acc = 0;
         }
     }
 
-    // step 2: figure out what the camera should be doing
+    /* step 2: figure out what the camera should be doing */
     {
         if (scene_timer == CAMERA_MOVE_T)
             newton->x_vel = CAMERA_INIT_VEL;
-        // if before newton catching up to apple, accelerate
+        /* if before newton catching up to apple, accelerate */
         if (newton->x_vel > 0 && apple_is_offscreen)
             newton->x_vel *= CAMERA_SPEEDUP_K;
-        // once caught up, use negative feedback to sync with apple speed
+        /* once caught up, use negative feedback to sync with apple speed */
         else if (newton->x_vel > 0 && apple_is_onscreen)
             newton->x_vel -= CAMERA_SLOWDOWN_K*(newton->x_vel - objects[APPLE].x_vel);
     }
 
-    // step 3: update physics
+    /* step 3: update physics */
     {
-        // so this updates the absolute position of the apple
+        /* so this updates the absolute position of the apple */
         update_physics(objects, APPLE, MODE_ABSOLUTE);
-        // now do another update considering the scene movement
+        /* now do another update considering the scene movement */
         objects[APPLE].x_pos -= newton->x_vel;
-        // once the apple has come back onscreen, (after Newton runs after it),
-        // check it hasn't gone past where it should be
+        /* once the apple has come back onscreen, (after Newton runs after it),
+           check it hasn't gone past where it should be */
         if (newton->x_vel > 0 && objects[APPLE].x_pos <= INIT_APPLE_X)
             objects[APPLE].x_pos = INIT_APPLE_X;
 
@@ -119,18 +119,18 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
         tree->x_pos -= newton->x_vel;
     }
 
-    // step 4: draw the scene
+    /* step 4: draw the scene */
     {
         if (scene_timer >= CAMERA_MOVE_T) {
-            // running!
+            /* running! */
             anim_state->velocity = newton->x_vel;
             draw_objects_with_animate(objects, anim_state);
         } else {
             draw_object_sprite_n(&objects[GROUND], 1);
             draw_object_sprite_n(&objects[APPLE], 1);
-            if (scene_timer > GUST_T) // awake!
+            if (scene_timer > GUST_T) /* awake! */
                 draw_object_sprite_n(newton, 1);
-            else    // still asleep
+            else    /* still asleep */
                 draw_object_sprite_n(newton, 3);
         }
 
@@ -152,18 +152,18 @@ int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
 
     if (newton->x_vel > 0 &&
             objects[APPLE].x_pos == INIT_APPLE_X) {
-        newton->x_vel = 0; // ready for main game scene
-        return 1;   // finished
+        newton->x_vel = 0; /* ready for main game scene */
+        return 1;   /* finished */
     } else
         return 0;
 }
 
-extern const float G;   // defined in physics.c
+extern const float G;   /* defined in physics.c */
 int show_instructions(object *objects, ALLEGRO_DISPLAY *display,
                       ALLEGRO_BITMAP *instructions1, ALLEGRO_BITMAP *instructions2,
                       int scene_timer, animation_state_struct *anim_state)
 {
-    ALLEGRO_BITMAP *instructions = instructions1; // by default
+    ALLEGRO_BITMAP *instructions = instructions1; /* by default */
     int cycle_finished = 0;
 
     const int PAUSE_T = 60;
@@ -172,12 +172,12 @@ int show_instructions(object *objects, ALLEGRO_DISPLAY *display,
         objects[APPLE].y_acc = G;
 
     if (scene_timer >= PAUSE_T &&
-            objects[APPLE].y_pos > CANVAS_HEIGHT * 0.4) {   // too low!
-        objects[APPLE].y_acc = -G;    // bloooow!
+            objects[APPLE].y_pos > CANVAS_HEIGHT * 0.4) {   /* too low! */
+        objects[APPLE].y_acc = -G;    /* bloooow! */
         instructions = instructions2;
     } else if (scene_timer >= PAUSE_T &&
-            objects[APPLE].y_pos < CANVAS_HEIGHT * 0.4) {  // high enough, stop blowing
-        if (objects[APPLE].y_acc != G) // we've just switched
+            objects[APPLE].y_pos < CANVAS_HEIGHT * 0.4) {  /* high enough, stop blowing */
+        if (objects[APPLE].y_acc != G) /* we've just switched */
             cycle_finished = 1;
         objects[APPLE].y_acc = G;
         instructions = instructions1;
@@ -199,7 +199,7 @@ void init_game(game_state_struct *game_state, object *objects)
     game_state->lives = 6;
     enum object_ctr i;
     for (i = 0; i < LAST_MOVER; i++) {
-        // give the player some time to get used to things
+        /* give the player some time to get used to things */
         if (i == BIRD || i == PROJECTILE) {
             objects[i].destroyed = 1;
             load_respawn(&objects[i], i, 1.0);

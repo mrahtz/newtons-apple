@@ -15,8 +15,8 @@
 #include "audio.h"
 #include "tick.h"
 
-// defined in images/images.c, which is included
-// by resources.c
+/* defined in images/images.c, which is included
+   by resources.c */
 extern unsigned char newtonhead_png[];
 extern int newtonhead_png_size;
 
@@ -30,13 +30,12 @@ ALLEGRO_DISPLAY * init_allegro(ALLEGRO_EVENT_QUEUE **event_queue, ALLEGRO_TIMER 
     al_init_ttf_addon();
     al_install_mouse();
 
-    // creating the display before loading the sprites produces a slight pause,
-    // but otherwise bitmaps will be loaded into system RAM (rather than video RAM)
-    // and be really slow
+    /* creating the display before loading the sprites produces a slight pause,
+       but otherwise bitmaps will be loaded into system RAM (rather than video RAM)
+       and be really slow */
     display = al_create_display(CANVAS_WIDTH, CANVAS_HEIGHT);
 
     *event_queue = al_create_event_queue();
-    // TODO free this frame_timer?
     *frame_timer = al_create_timer(1/60.0);
     if (!(*frame_timer))
         die("couldn't create frame_timer\n");
@@ -56,41 +55,28 @@ void free_allegro(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *event_queue, AL
     al_destroy_display(display);
 }
 
-/*void show_error_dialog(ALLEGRO_DISPLAY *display, char *text)
-{
-    al_init_native_dialog_addon();
-    char *title = "Error";
-    char *heading = "Failed to grab microphone";
-    char *buttons = "Quit";
-    al_show_native_message_box(display, title, heading, text, buttons, ALLEGRO_MESS
-    int al_show_native_message_box(ALLEGRO_DISPLAY *display,
-    char const *title, char const *heading, char const *text,
-    char const *buttons, int flags)
-    al_shutdown_native_dialog_addon();
-}*/
-
 int main(void)
 {
-    // stuff for init_allegro
+    /* stuff for init_allegro */
     ALLEGRO_EVENT_QUEUE *event_queue;
     ALLEGRO_TIMER *frame_timer;
     ALLEGRO_DISPLAY *display;
 
-    // stuff for init_audio
+    /* stuff for init_audio */
     PaStream *audio_stream;
     float audio_level = 0;
 
-    // stuff for load_resources
-    ALLEGRO_FONT *font = NULL; // so clang is ok it being passed to load_resources
+    /* stuff for load_resources */
+    ALLEGRO_FONT *font = NULL; /* so clang is ok it being passed to load_resources */
     intro_resource_struct intro_resources;
     object objects[OBJECTS_END];
 
-    // just used in main
+    /* just used in main */
     ALLEGRO_BITMAP *head_bitmap;
 
     game_state_struct game_state;
 
-    // initialisation
+    /* initialisation */
     {
         srand(time(NULL));
         display = init_allegro(&event_queue, &frame_timer);
@@ -103,7 +89,7 @@ int main(void)
         load_resources(&font, &intro_resources, objects);
 
         game_state.scene = INIT_TITLE;
-        /* for quick testing of game loop */
+        /* for quick testing of main game scene */
         /*game_state.scene = INIT_GAME_WITH_RESET;
         objects[APPLE].reset_x_vel = 18;*/
         game_state.anim_state.last_frame_n = 0;
@@ -112,14 +98,14 @@ int main(void)
         game_state.anim_state.velocity = 0;
     }
 
-    // game loop
+    /* game loop */
     while (1) {
         ALLEGRO_EVENT ev;
         al_wait_for_event(event_queue, &ev);
 
         if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
             handle_click(&(game_state.scene));
-        else if (ev.type == ALLEGRO_EVENT_TIMER)    // time for next frame to be drawn
+        else if (ev.type == ALLEGRO_EVENT_TIMER)    /* time for next frame to be drawn */
             tick(&game_state, audio_level, objects, display, font, &intro_resources);
         else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || game_state.scene == QUIT)
             break;
