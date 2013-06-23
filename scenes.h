@@ -11,7 +11,6 @@
 
 void show_titlescreen(ALLEGRO_FONT *font, object *newton, int ticks);
 void init_game(game_state_struct *game_state, object *objects);
-void reset_objects(object *objects);
 int show_intro(object *objects, ALLEGRO_DISPLAY *display, ALLEGRO_FONT *font,
 			   int scene_timer, animation_state_struct *anim_state);
 int show_instructions(object *objects, ALLEGRO_DISPLAY *display,
