@@ -1,1 +1,1 @@
-clang -Wall -Werror -g main.c game.c helpers.c -o newtonsapple $(pkg-config --libs --cflags allegro-5.0 allegro_main-5.0 allegro_image-5.0 portaudio-2.0 allegro_font-5.0 allegro_ttf-5.0) && ./newtonsapple
+clang -g -Wall -Werror -g main.c physics.c graphics.c utilities.c audio.c resources.c tick.c scenes.c object_init.c -o newtonsapple $(pkg-config --libs --cflags allegro-5.0 allegro_main-5.0 allegro_image-5.0 portaudio-2.0 allegro_font-5.0 allegro_ttf-5.0 allegro_memfile-5.0)
