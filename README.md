@@ -1,6 +1,6 @@
 ## Newton's Apple
 
-Use the wind to stop Newton getting that apple!
+Stop Newton getting that apple! Blow into the microphone to control the wind.
 
 Stupid little Flappy Bird-esque game done for first year programming module at
 university.
