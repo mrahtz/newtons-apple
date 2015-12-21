@@ -1,6 +1,6 @@
 #include "resources.h"
 /* contains hex dumps of images and font in arrays */
-#include "resources/packed_resources.c"
+#include "../resources/packed_resources.c"
 
 ALLEGRO_FONT * load_packed_font(unsigned char *mem, int mem_size, int font_size)
 {
