@@ -59,7 +59,8 @@ static void init_sprite(object *o, int object_n)
         case NEWTON:
             mem1 = newton1_png;
             mem2 = newton2_png;
-            size1 = size2 = newton1_png_size;
+            size1 = newton1_png_size;
+            size2 = newton2_png_size;
             o->sprite3 = load_packed_bitmap(newton_asleep_png, newton_asleep_png_size);
             break;
         case GROUND:
