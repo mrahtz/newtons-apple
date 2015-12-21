@@ -17,7 +17,7 @@ On Ubuntu 15.10:
 sudo apt-get -y install liballegro5-dev portaudio19-dev
 ```
 
-On OS X;
+On OS X:
 
 ```
 brew install allegro portaudio
